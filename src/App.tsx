@@ -1,8 +1,13 @@
+import { ThemeProvider } from './components/theme/ThemeProvider'
 import { AppRouter } from './router/AppRouter'
 
 function App() {
 
-  return <AppRouter/>
+  return (
+    <ThemeProvider>
+      <AppRouter />
+    </ThemeProvider>
+  )
   // const [count, setCount] = useState(0)
 
   // return (
