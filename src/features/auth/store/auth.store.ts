@@ -23,12 +23,13 @@ export const useAuthStore = create<AuthState>()(
 
       setAuth: (user, token) => {
         // Guarda en localStorage para el interceptor de Axios
-        localStorage.setItem('token', token)
-        set({ user, token, isAuthenticated: true })
+        // localStorage.setItem('token', token)
+
+        set({ user, token, isAuthenticated: true }) // Persis se encarga de guardar en localStorage automáticamente
       },
 
       clearAuth: () => {
-        localStorage.removeItem('token')
+        // localStorage.removeItem('token')
         set({ user: null, token: null, isAuthenticated: false })
       },
     }),
