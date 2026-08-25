@@ -1,5 +1,5 @@
-import { useLogout } from "../features/auth/hooks/useAuth"
-import { useAuthStore } from "../features/auth/store/auth.store"
+import { useLogout } from "../../features/auth/hooks/useAuth"
+import { useAuthStore } from "../../features/auth/store/auth.store"
 
 export const DashboardPage = () => {
   const user = useAuthStore((state) => state.user)

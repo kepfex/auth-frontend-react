@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { RegisterForm } from '../features/auth/components/RegisterForm'
+import { RegisterForm } from '../../features/auth/components/RegisterForm'
 
 export const RegisterPage = () => (
   <div style={{ maxWidth: 400, margin: '80px auto', padding: 24 }}>

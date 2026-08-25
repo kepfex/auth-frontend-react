@@ -1,4 +1,4 @@
-import { LoginForm } from "../features/auth/components/LoginForm";
+import { LoginForm } from "../../features/auth/components/LoginForm";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export const LoginPage = () => (
