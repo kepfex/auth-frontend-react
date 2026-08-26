@@ -5,6 +5,7 @@ import { LoginPage } from '../pages/auth/LoginPage'
 import { RegisterPage } from '../pages/auth/RegisterPage'
 import { DashboardPage } from '../pages/admin/DashboardPage'
 import HomePage from '@/pages/HomePage'
+import AdminLayout from '@/layouts/AdminLayout'
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -16,7 +17,9 @@ export const AppRouter = () => (
 
       {/* Rutas privadas — protegidas por AuthGuard */}
       <Route element={<AuthGuard />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<DashboardPage />} />
+        </Route>
       </Route>
 
       {/* Ruta por defecto */}

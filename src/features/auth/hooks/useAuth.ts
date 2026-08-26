@@ -17,7 +17,7 @@ export const useLogin = () => {
     try {
       const response = await loginApi(data);
       setAuth(response.user, response.token); // guarda en Zustand + localStorage
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (err: unknown) {
       const data = (
         err as { response?: { data?: { message?: string; error?: string } } }
@@ -46,7 +46,7 @@ export const useRegister = () => {
     try {
       const response = await registerApi(data);
       setAuth(response.user, response.token);
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data
