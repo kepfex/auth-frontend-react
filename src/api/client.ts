@@ -10,7 +10,7 @@ export const apiClient = axios.create({
 // INTERCEPTOR DE REQUEST:
 // Antes de cada petición, agrega el token si existe en localStorage
 apiClient.interceptors.request.use((config) => {
-    const token = useAuthStore.getState().token || localStorage.getItem('token') // Leer el token desde Zustand o localStorage
+    const token = useAuthStore.getState().token // Leer el token desde Zustand
     if(token) {
         config.headers.Authorization = `Bearer ${token}`
     }

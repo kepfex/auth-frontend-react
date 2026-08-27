@@ -72,9 +72,8 @@ export default function Sidebar({
 }: SidebarProps) {
   return (
     <aside
-      className={`transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 select-none z-20 h-full overflow-hidden ${
-        sidebarOpen ? "w-64" : "w-20"
-      }`}
+      className={`transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 select-none z-20 h-full overflow-hidden
+        ${sidebarOpen ? 'w-64' : 'w-20'}`}
     >
       <div className="p-3 overflow-y-auto overflow-x-hidden space-y-6 flex-1 min-h-0">
         {MENU_GROUPS.map((group, groupIdx) => (

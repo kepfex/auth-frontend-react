@@ -10,8 +10,13 @@ export default function AdminLayout() {
   const [activeTab, setActiveTab] = useState<string>("dashboard");
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-200">
-      <Navbar userMenuOpen={userMenuOpen} setUserMenuOpen={setUserMenuOpen} />
+    <div className="h-screen w-screen overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-200">
+      <Navbar 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen} 
+        userMenuOpen={userMenuOpen} 
+        setUserMenuOpen={setUserMenuOpen} 
+      />
       <div
         className="flex flex-1 min-h-0 overflow-hidden"
         onClick={() => {
