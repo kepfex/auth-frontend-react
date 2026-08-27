@@ -105,7 +105,7 @@ export default function Sidebar({
       {/* Sidebar Footer Info Card */}
       {sidebarOpen && (
         <div className="p-3 border-t border-slate-200 dark:border-slate-800 shrink-0">
-          <div className="p-3.5 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 rounded-xl border border-indigo-200/50 dark:border-indigo-800/40 text-center">
+          <div className="p-3.5 bg-linear-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 rounded-xl border border-indigo-200/50 dark:border-indigo-800/40 text-center">
             <p className="text-xs font-semibold text-indigo-900 dark:text-indigo-200">
               Período Lectivo 2026
             </p>

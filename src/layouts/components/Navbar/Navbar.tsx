@@ -28,7 +28,7 @@ export default function Navbar({sidebarOpen, setSidebarOpen, userMenuOpen, setUs
         </button>
 
         <div className="flex items-center space-x-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+          <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
             <GraduationCap className="w-5 h-5" />
           </div>
           <div className="flex flex-col">
