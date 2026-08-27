@@ -1,12 +1,19 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider } from './components/theme/ThemeProvider'
 import { AppRouter } from './router/AppRouter'
 
 function App() {
+// Create a client
+const queryClient = new QueryClient()
 
   return (
-    <ThemeProvider>
-      <AppRouter />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AppRouter />
+      </ThemeProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   )
   // const [count, setCount] = useState(0)
 
