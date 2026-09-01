@@ -16,7 +16,7 @@ export const useLogin = () => {
     setError(null);
     try {
       const response = await loginApi(data);
-      setAuth(response.user, response.token); // guarda en Zustand + localStorage
+      setAuth(response.user, response.token, response.academic_year); // guarda en Zustand + localStorage
       navigate("/admin");
     } catch (err: unknown) {
       const data = (
@@ -45,7 +45,7 @@ export const useRegister = () => {
     setError(null);
     try {
       const response = await registerApi(data);
-      setAuth(response.user, response.token);
+      setAuth(response.user, response.token, response.academic_year); // guarda en Zustand + localStorage
       navigate("/admin");
     } catch (err: unknown) {
       const message =

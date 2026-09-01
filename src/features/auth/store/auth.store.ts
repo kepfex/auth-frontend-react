@@ -1,15 +1,20 @@
 import { create } from "zustand"
-import type { User } from "../types/auth.types"
+import type { AcademicYear, User } from "../types/auth.types"
 import { persist } from "zustand/middleware"
 
 // Define QUÉ datos guarda y QUÉ acciones existen
 interface AuthState {
+  // Datos de sesión
   user: User | null
   token: string | null
   isAuthenticated: boolean
 
+  // Contexto global de la app - filtra toda la data
+  academicYear: AcademicYear | null
+
   // Acciones
-  setAuth: (user: User, token: string) => void
+  setAuth: (user: User, token: string, academicYear: AcademicYear | null) => void
+  setAcademicYear: (academicYear: AcademicYear | null) => void // para cambiar año desde un selector
   clearAuth: () => void
 }
 
@@ -20,6 +25,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
+      academicYear: null,
 
       setAuth: (user, token) => {
         // Guarda en localStorage para el interceptor de Axios
@@ -28,9 +34,13 @@ export const useAuthStore = create<AuthState>()(
         set({ user, token, isAuthenticated: true }) // Persis se encarga de guardar en localStorage automáticamente
       },
 
+      // Selector de año académico global
+      setAcademicYear(academicYear) {
+        set({ academicYear })
+      },
+
       clearAuth: () => {
-        // localStorage.removeItem('token')
-        set({ user: null, token: null, isAuthenticated: false })
+        set({ user: null, token: null, isAuthenticated: false, academicYear: null })
       },
     }),
     {
@@ -40,6 +50,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated,
+        academicYear: state.academicYear,
       }),
     }
   )
