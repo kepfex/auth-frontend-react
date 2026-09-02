@@ -27,11 +27,11 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       academicYear: null,
 
-      setAuth: (user, token) => {
+      setAuth: (user, token, academicYear) => {
         // Guarda en localStorage para el interceptor de Axios
         // localStorage.setItem('token', token)
 
-        set({ user, token, isAuthenticated: true }) // Persis se encarga de guardar en localStorage automáticamente
+        set({ user, token, isAuthenticated: true, academicYear }) // Persis se encarga de guardar en localStorage automáticamente
       },
 
       // Selector de año académico global
