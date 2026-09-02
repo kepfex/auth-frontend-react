@@ -1,10 +1,6 @@
-import {
-  ChevronDown,
-  GraduationCap,
-  Menu,
-  Sun,
-} from "lucide-react";
+import { ChevronDown, GraduationCap, Menu, Sun } from "lucide-react";
 import UserDropdown from "./UserDropdown";
+import { AcademicYearSelector } from "@/features/academic-years/components/AcademicYearSelector";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -13,13 +9,18 @@ interface NavbarProps {
   setUserMenuOpen: (open: boolean) => void;
 }
 
-export default function Navbar({sidebarOpen, setSidebarOpen, userMenuOpen, setUserMenuOpen}: NavbarProps) {
+export default function Navbar({
+  sidebarOpen,
+  setSidebarOpen,
+  userMenuOpen,
+  setUserMenuOpen,
+}: NavbarProps) {
   return (
     <header className="h-16 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 transition-colors">
       {/* Left Section: Logo & Sidebar Toggle */}
       <div className="flex items-center space-x-3">
         <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
           title="Expandir/Contraer Sidebar"
           aria-label="Toggle Navigation Sidebar"
@@ -45,6 +46,9 @@ export default function Navbar({sidebarOpen, setSidebarOpen, userMenuOpen, setUs
 
       {/* Right Section: Theme Selector & User Profile */}
       <div className="flex items-center space-x-3 sm:space-x-4">
+        {/* ✅ Selector de año académico — visible siempre */}
+        <AcademicYearSelector />
+
         {/* Theme Dropdown Toggle */}
         <div className="relative">
           <button

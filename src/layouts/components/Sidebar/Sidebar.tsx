@@ -1,5 +1,5 @@
 import type { MenuGroup } from "@/layouts/schemas/layout.schema";
-import { BarChart3, BookOpen, CalendarCheck2, FileSpreadsheet, LayoutDashboard, Sliders, Users } from "lucide-react";
+import { BarChart3, CalendarCheck2, FileSpreadsheet, LayoutDashboard, School, Sliders, Users } from "lucide-react";
 import SidebarItem from "./SidebarItem";
 
 const MENU_GROUPS: MenuGroup[] = [
@@ -33,9 +33,10 @@ const MENU_GROUPS: MenuGroup[] = [
       },
       {
         id: 'academico',
-        label: 'Académico & Aulas',
-        icon: BookOpen,
+        label: 'Gestión Académica',
+        icon: School,
         items: [
+          { id: 'academico-anios', label: 'Años Académicos' },
           { id: 'academico-cursos', label: 'Cursos & Materias' },
           { id: 'academico-horarios', label: 'Horarios de Clases' },
           { id: 'academico-docentes', label: 'Asignación Docente' }

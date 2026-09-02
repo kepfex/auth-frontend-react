@@ -5,7 +5,7 @@ import { useLogin } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Lock, Mail } from "lucide-react";
+import { Loader2, Lock, Mail } from "lucide-react";
 
 export const LoginForm = () => {
   const { login, isLoading, error } = useLogin();
@@ -104,7 +104,14 @@ export const LoginForm = () => {
         disabled={isLoading}
         className="w-full py-5 bg-phoenix-gold hover:bg-phoenix-gold/90 font-bold rounded-xl shadow-lg transition-all duration-300 space-x-2 cursor-pointer transform hover:-translate-y-0.5"
       >
-        {isLoading ? "Ingresando..." : "Iniciar Sesión"}
+        {isLoading 
+          ? (
+          <>
+            <Loader2 className="animate-spin " /> Ingresando...
+          </>
+        ) 
+          : "Iniciar Sesión"
+        }
       </Button>
     </form>
   );
