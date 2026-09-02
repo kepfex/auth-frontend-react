@@ -1,3 +1,5 @@
+import type { AcademicYear } from "@/features/academic-years/types/academic-year.types"
+
 // Lo que enviamos al servidor
 export interface LoginRequest {
     email: string
@@ -14,14 +16,6 @@ export interface User {
     id: string
     name: string
     email: string
-}
-
-export interface AcademicYear {
-    id: number
-    name: string
-    start_date: string
-    end_date: string
-    is_active: boolean
 }
 
 // Lo que el servidor nos devuelve

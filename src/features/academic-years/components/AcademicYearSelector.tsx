@@ -12,7 +12,7 @@ import {
 import { useAuthStore } from '@/features/auth/store/auth.store'
 import { useAcademicYears } from '../hooks/useAcademicYears'
 import { cn } from '@/lib/utils'
-import type { AcademicYear } from '@/features/auth/types/auth.types'
+import type { AcademicYear } from '../types/academic-year.types'
 
 export const AcademicYearSelector = () => {
     // Año actualmente seleccionado en la sesión
