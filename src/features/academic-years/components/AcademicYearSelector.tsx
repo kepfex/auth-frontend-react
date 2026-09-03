@@ -10,7 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useAuthStore } from '@/features/auth/store/auth.store'
-import { useAcademicYears } from '../hooks/useAcademicYears'
+import { useAcademicYearsAll } from '../hooks/useAcademicYears'
 import { cn } from '@/lib/utils'
 import type { AcademicYear } from '../types/academic-year.types'
 
@@ -20,7 +20,7 @@ export const AcademicYearSelector = () => {
     const setAcademicYear = useAuthStore((state) => state.setAcademicYear)
 
     // Lista de todos los años desde la API (cacheada 30 min)
-    const { data: years, isLoading } = useAcademicYears()
+    const { data: years, isLoading } = useAcademicYearsAll()
 
     const handleSelect = (year: AcademicYear) => {
         if (year.id === academicYear?.id) return // ya está seleccionado
