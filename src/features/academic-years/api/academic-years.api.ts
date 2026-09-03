@@ -1,14 +1,14 @@
 import { apiClient } from "@/api/client";
-import type { AcademicYear, CreateAcademicYearRequest, UpdateAcademicYearRequest } from "../types/academic-year.types";
+import type { AcademicYear, CreateAcademicYearRequest, PaginatedResponse, UpdateAcademicYearRequest } from "../types/academic-year.types";
 
-interface PaginatedResponse<T> {
-    data: T[];
-    meta: {
-        current_page: number;
-        last_page: number;
-        total: number;
-    };
-}
+// interface PaginatedResponse<T> {
+//     data: T[];
+//     meta: {
+//         current_page: number;
+//         last_page: number;
+//         total: number;
+//     };
+// }
 
 const BASE = '/academic-years';
 
