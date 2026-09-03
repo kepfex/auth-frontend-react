@@ -6,6 +6,7 @@ import { RegisterPage } from '../pages/auth/RegisterPage'
 import { DashboardPage } from '../pages/admin/DashboardPage'
 import HomePage from '@/pages/HomePage'
 import AdminLayout from '@/layouts/AdminLayout'
+import { AcademicYearsPage } from '@/pages/admin/academic-years/AcademicYearsPage'
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -19,6 +20,7 @@ export const AppRouter = () => (
       <Route element={<AuthGuard />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
+          <Route path="academic-years" element={<AcademicYearsPage />} />
         </Route>
       </Route>
 
