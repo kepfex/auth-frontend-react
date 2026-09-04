@@ -12,21 +12,20 @@ interface Props {
 
 export const AcademicYearTable = ({ years, onEdit, onDelete }: Props) => {
   return (
-    <div className="bg-white overflow-hidden">
         <Table>
             <TableHeader>
-                <TableRow className="border-b border-slate-100 dark:border-zinc-800/60 bg-slate-50/75 dark:bg-zinc-900/40 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
-                    <TableHead className="w-24">Año</TableHead>
+                <TableRow>
+                    <TableHead>Año</TableHead>
                     <TableHead>Fecha inicio</TableHead>
                     <TableHead>Fecha fin</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead className="text-right w-28">Acciones</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {years.map((year) => (
-                    <TableRow key={year.id} className="">
-                        <TableCell className="font-semibold text-base">
+                    <TableRow key={year.id}>
+                        <TableCell className="font-semibold text-foreground">
                             {year.name}
                         </TableCell>
                         <TableCell className="">
@@ -37,11 +36,11 @@ export const AcademicYearTable = ({ years, onEdit, onDelete }: Props) => {
                         </TableCell>
                         <TableCell>
                             {year.is_active ? (
-                                <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-0">
+                                <Badge variant="outline" className="border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                                         Activo
                                 </Badge>
                             ) : (
-                                <Badge className="bg-muted text-muted-foreground border-0">
+                                <Badge className="border-muted-foreground/20 bg-muted text-muted-foreground">
                                         Inactivo
                                 </Badge>
                             )}
@@ -51,7 +50,7 @@ export const AcademicYearTable = ({ years, onEdit, onDelete }: Props) => {
                                 <Button
                                         size="icon"
                                         variant="ghost"
-                                        className="h-8 w-8 hover:text-phoenix-gold"
+                                        className="h-8 w-8 hover:text-primary"
                                         onClick={() => onEdit(year)}
                                         title="Editar"
                                 >
@@ -73,6 +72,5 @@ export const AcademicYearTable = ({ years, onEdit, onDelete }: Props) => {
                 ))}
             </TableBody>
         </Table>
-    </div>
   )
 }
