@@ -3,6 +3,7 @@ import type { AcademicYear } from "../types/academic-year.types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Pencil, Trash2 } from "lucide-react"
+import { formatDateLong } from "@/shared/utils/date"
 
 interface Props {
     years: AcademicYear[]
@@ -29,10 +30,10 @@ export const AcademicYearTable = ({ years, onEdit, onDelete }: Props) => {
                             {year.name}
                         </TableCell>
                         <TableCell className="">
-                            {year.start_date}
+                            {formatDateLong(year.start_date)}
                         </TableCell>
                         <TableCell className="">
-                            {year.end_date}
+                            {formatDateLong(year.end_date)}
                         </TableCell>
                         <TableCell>
                             {year.is_active ? (

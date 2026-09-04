@@ -4,8 +4,8 @@ export interface AcademicYear {
   start_date: string;
   end_date: string;
   is_active: boolean;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Lo que enviamos al servidor para crear un nuevo año académico
@@ -20,8 +20,8 @@ export interface CreateAcademicYearRequest {
 export type UpdateAcademicYearRequest = Partial<CreateAcademicYearRequest>;
 
 // Respuesta paginada de la API de Laravel
-export interface PaginatedResponse<T> {
-  data: T[];
+export interface PaginatedResponse {
+  data: AcademicYear[];
   links: {
     first: string;
     last: string;

@@ -13,7 +13,7 @@ import type { AcademicYear, CreateAcademicYearRequest, PaginatedResponse, Update
 const BASE = '/academic-years';
 
 export const getAcademicYearsApi = async (): Promise<AcademicYear[]> => {
-    const {data} = await apiClient.get<PaginatedResponse<AcademicYear>>(
+    const {data} = await apiClient.get<PaginatedResponse>(
         "/academic-years?per_page=50" // trae todos — nunca habrá 50 años académicos
     );
     return data.data; // desenvuelve la paginación de Laravel
@@ -21,8 +21,8 @@ export const getAcademicYearsApi = async (): Promise<AcademicYear[]> => {
 
 export const academicYearsApi = {
     // GET /academic-years?page=1&per_page=10
-    getAll: async (page = 1): Promise<PaginatedResponse<AcademicYear>> => {
-        const {data} = await apiClient.get<PaginatedResponse<AcademicYear>>(BASE, {
+    getAll: async (page = 1): Promise<PaginatedResponse> => {
+        const {data} = await apiClient.get<PaginatedResponse>(BASE, {
             params: { page, per_page: 10 }
         })
         return data;
