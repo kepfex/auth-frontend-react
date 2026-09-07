@@ -23,7 +23,7 @@ export const AcademicYearFormDialog = ({ open, onClose, editingYear }: Props) =>
     const { mutate: update, isPending: isUpdating } = useUpdateAcademicYear()
     const isPending = isCreating || isUpdating
 
-    const form = useForm({
+    const form = useForm<AcademicYearFormData>({
         resolver: zodResolver(academicYearSchema),
         defaultValues: {
             name: '',
@@ -32,20 +32,23 @@ export const AcademicYearFormDialog = ({ open, onClose, editingYear }: Props) =>
             is_active: false,
         },
     })
+    const {reset} = form;
 
     // Cuando se abre para editar, precarga los valores
     useEffect(() => {
+        if (!open) return;
+        
         if (editingYear) {
-            form.reset({
+            reset({
                 name: editingYear.name,
                 start_date: editingYear.start_date,
                 end_date: editingYear.end_date,
                 is_active: editingYear.is_active,
             })
         } else {
-            form.reset({ name: '', start_date: '', end_date: '', is_active: false })
+            reset({ name: '', start_date: '', end_date: '', is_active: false })
         }
-    }, [editingYear, open])
+    }, [open, editingYear, reset])
 
     const onSubmit = (data: AcademicYearFormData) => {
         if (isEditing && editingYear) {

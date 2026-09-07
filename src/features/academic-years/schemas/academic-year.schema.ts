@@ -15,7 +15,7 @@ export const academicYearSchema = z.object({
         ),
     start_date: z.string().min(1, 'La fecha de inicio es obligatoria'),
     end_date: z.string().min(1, 'La fecha de fin es obligatoria'),
-    is_active: z.boolean().optional().default(false),
+    is_active: z.boolean(),
 })
 .refine((data) => data.end_date > data.start_date, {
     message: 'La fecha de fin debe ser posterior a la fecha de inicio.',
