@@ -1,6 +1,7 @@
 import { create } from "zustand"
-import type { AcademicYear, User } from "../types/auth.types"
+import type { User } from "../types/auth.types"
 import { persist } from "zustand/middleware"
+import type { AcademicYear } from "@/features/academic-years/types/academic-year.types"
 
 // Define QUÉ datos guarda y QUÉ acciones existen
 interface AuthState {

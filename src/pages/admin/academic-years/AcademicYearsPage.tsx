@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { AcademicYearFormDialog } from "@/features/academic-years/components/AcademicYearFormDialog";
 import { AcademicYearTable } from "@/features/academic-years/components/AcademicYearTable";
+import { DeleteAcademicYearDialog } from "@/features/academic-years/components/DeleteAcademicYearDialog";
 import { useAcademicYears } from "@/features/academic-years/hooks/useAcademicYears";
 import type { AcademicYear } from "@/features/academic-years/types/academic-year.types";
 import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react";
@@ -7,9 +9,9 @@ import { useState } from "react";
 
 export const AcademicYearsPage = () => {
   const [page] = useState(1);
-  const [, setFormOpen] = useState(false);
-  const [, setEditingYear] = useState<AcademicYear | null>(null);
-  const [, setDeletingYear] = useState<AcademicYear | null>(null);
+  const [formOpen, setFormOpen] = useState(false)
+  const [editingYear, setEditingYear] = useState<AcademicYear | null>(null)
+  const [deletingYear, setDeletingYear] = useState<AcademicYear | null>(null)
 
   const { data, isLoading, isError } = useAcademicYears(page);
 
@@ -18,10 +20,10 @@ export const AcademicYearsPage = () => {
     setFormOpen(true);
   };
 
-  // const handleCloseForm = () => {
-  //   setFormOpen(false);
-  //   setEditingYear(null); // limpia al cerrar
-  // };
+  const handleCloseForm = () => {
+    setFormOpen(false);
+    setEditingYear(null); // limpia al cerrar
+  };
 
   return (
     <div className="space-y-6">
@@ -84,7 +86,7 @@ export const AcademicYearsPage = () => {
                   variant="outline"
                   className="h-8 w-8"
                   disabled={page === 1}
-                  // onClick={() => setPage((p) => p - 1)}
+                // onClick={() => setPage((p) => p - 1)}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -96,7 +98,7 @@ export const AcademicYearsPage = () => {
                   variant="outline"
                   className="h-8 w-8"
                   disabled={page === data.meta.last_page}
-                  // onClick={() => setPage((p) => p + 1)}
+                // onClick={() => setPage((p) => p + 1)}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -105,6 +107,18 @@ export const AcademicYearsPage = () => {
           )}
         </>
       )}
+
+      {/* Dialogs */}
+      <AcademicYearFormDialog
+        open={formOpen}
+        onClose={handleCloseForm}
+        editingYear={editingYear}
+      />
+
+      <DeleteAcademicYearDialog
+        year={deletingYear}
+        onClose={() => setDeletingYear(null)}
+      />
     </div>
   );
 };
