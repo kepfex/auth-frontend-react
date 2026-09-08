@@ -8,7 +8,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
 
 export const AcademicYearsPage = () => {
-  const [page] = useState(1);
+  const [page, setPage] = useState(1)
   const [formOpen, setFormOpen] = useState(false)
   const [editingYear, setEditingYear] = useState<AcademicYear | null>(null)
   const [deletingYear, setDeletingYear] = useState<AcademicYear | null>(null)
@@ -86,7 +86,7 @@ export const AcademicYearsPage = () => {
                   variant="outline"
                   className="h-8 w-8"
                   disabled={page === 1}
-                // onClick={() => setPage((p) => p - 1)}
+                  onClick={() => setPage((p) => p - 1)}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -98,7 +98,7 @@ export const AcademicYearsPage = () => {
                   variant="outline"
                   className="h-8 w-8"
                   disabled={page === data.meta.last_page}
-                // onClick={() => setPage((p) => p + 1)}
+                  onClick={() => setPage((p) => p + 1)}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
