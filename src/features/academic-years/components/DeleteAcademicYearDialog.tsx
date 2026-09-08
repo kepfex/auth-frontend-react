@@ -1,6 +1,7 @@
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import type { AcademicYear } from "../types/academic-year.types"
 import { useDeleteAcademicYear } from "../hooks/useAcademicYears"
+import { Trash2Icon } from "lucide-react"
 
 interface Props {
     year: AcademicYear | null
@@ -17,23 +18,25 @@ export const DeleteAcademicYearDialog = ({ year, onClose }: Props) => {
 
     return (
         <AlertDialog open={!!year} onOpenChange={(v) => !v && onClose()}>
-            <AlertDialogContent>
+            <AlertDialogContent size="sm">
                 <AlertDialogHeader>
+                    <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                        <Trash2Icon />
+                    </AlertDialogMedia>
                     <AlertDialogTitle>
                         ¿Eliminar año académico {year?.name}?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        Esta acción no se puede deshacer. Se eliminará el período{' '}
-                        <strong>{year?.name}</strong> ({year?.start_date} — {year?.end_date}) del sistema.
+                        Esta acción no se puede deshacer.
                         Asegúrate de que no tenga estudiantes, asistencias u otros registros asociados.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
+                    <AlertDialogCancel variant={"outline"} disabled={isPending}>Cancelar</AlertDialogCancel>
                     <AlertDialogAction
+                    variant={"destructive"}
                         onClick={handleConfirm}
                         disabled={isPending}
-                        className="bg-destructive hover:bg-destructive/90 text-white"
                     >
                         {isPending ? 'Eliminando...' : 'Sí, eliminar'}
                     </AlertDialogAction>

@@ -211,10 +211,10 @@ export const AcademicYearFormDialog = ({
 
         <DialogFooter className="mt-2">
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={onClose}
             disabled={isPending}
-            className="bg-white border-slate-300 dark:border-slate-800 flex items-center justify-end gap-2.5"
+            // className="border-slate-300 dark:border-slate-800 flex items-center justify-end gap-2.5"
           >
             Cancelar
           </Button>
