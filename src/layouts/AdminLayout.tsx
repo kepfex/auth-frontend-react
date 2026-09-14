@@ -4,10 +4,9 @@ import { useState } from "react";
 import Sidebar from "./components/Sidebar/Sidebar";
 
 export default function AdminLayout() {
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>("asistencia");
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<string>("dashboard");
 
   return (
     <div className="h-screen w-screen overflow-hidden text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-200">
@@ -26,8 +25,6 @@ export default function AdminLayout() {
         <Sidebar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
           openSubmenu={openSubmenu}
           setOpenSubmenu={setOpenSubmenu}
         />

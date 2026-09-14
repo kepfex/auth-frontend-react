@@ -1,6 +1,9 @@
 import type { MenuGroup } from "@/layouts/schemas/layout.schema";
 import { BarChart3, CalendarCheck2, FileSpreadsheet, LayoutDashboard, School, Sliders, Users } from "lucide-react";
 import SidebarItem from "./SidebarItem";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { isRouteActive } from "@/layouts/utils/navigation";
 
 const MENU_GROUPS: MenuGroup[] = [
   {
@@ -9,7 +12,8 @@ const MENU_GROUPS: MenuGroup[] = [
       {
         id: 'dashboard',
         label: 'Inicio / Panel',
-        icon: LayoutDashboard
+        icon: LayoutDashboard,
+        path: '/admin'
       },
       {
         id: 'asistencia',
@@ -36,10 +40,21 @@ const MENU_GROUPS: MenuGroup[] = [
         label: 'Gestión Académica',
         icon: School,
         items: [
-          { id: 'academico-anios', label: 'Años Académicos' },
-          { id: 'academico-cursos', label: 'Cursos & Materias' },
-          { id: 'academico-horarios', label: 'Horarios de Clases' },
-          { id: 'academico-docentes', label: 'Asignación Docente' }
+          {
+            id: 'academico-anios',
+            label: 'Años Académicos',
+            path: '/admin/academic-years',
+          },
+          {
+            id: 'academico-level-grade-section',
+            label: 'Catálogo Base',
+            // path: '/admin/academic-structure',
+          },
+          {
+            id: 'academico-aulas',
+            label: 'Aulas y Secciones',
+            // path: '/admin/classrooms',
+          },
         ]
       }
     ]
@@ -57,8 +72,6 @@ const MENU_GROUPS: MenuGroup[] = [
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
   openSubmenu: string | null;
   setOpenSubmenu: (id: string | null) => void;
 }
@@ -66,11 +79,29 @@ interface SidebarProps {
 export default function Sidebar({
   sidebarOpen,
   setSidebarOpen,
-  activeTab,
-  setActiveTab,
   openSubmenu,
   setOpenSubmenu,
 }: SidebarProps) {
+
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const activeGroup = MENU_GROUPS
+      .flatMap((group) => group.items)
+      .find((item) =>
+        item.items?.some((subItem) =>
+          isRouteActive(
+            subItem.path,
+            pathname
+          )
+        )
+      );
+
+    if (activeGroup) {
+      setOpenSubmenu(activeGroup.id);
+    }
+  }, [pathname, setOpenSubmenu]);
+
   return (
     <aside
       className={`transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 select-none z-20 h-full overflow-hidden
@@ -92,8 +123,6 @@ export default function Sidebar({
                   item={item}
                   sidebarOpen={sidebarOpen}
                   setSidebarOpen={setSidebarOpen}
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
                   openSubmenu={openSubmenu}
                   setOpenSubmenu={setOpenSubmenu}
                 />
