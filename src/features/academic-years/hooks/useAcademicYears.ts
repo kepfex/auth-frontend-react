@@ -33,7 +33,7 @@ export const useAcademicYears = (page = 1) => {
 export const useAcademicYearsAll = () => {
     return useQuery({
         queryKey: ACADEMIC_YEARS_KEY.all,
-        queryFn: () => academicYearsApi.getAll(1).then((res) => res.data),
+        queryFn: () => academicYearsApi.getAll(1, 100).then((res) => res.data),
         staleTime: 1000 * 60 * 30, // 30 min — los años académicos no cambian seguido
     })
 }

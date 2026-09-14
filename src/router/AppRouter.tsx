@@ -7,6 +7,7 @@ import { DashboardPage } from '../pages/admin/DashboardPage'
 import HomePage from '@/pages/HomePage'
 import AdminLayout from '@/layouts/AdminLayout'
 import { AcademicYearsPage } from '@/pages/admin/academic-years/AcademicYearsPage'
+import { AcademicStructurePage } from '@/pages/admin/academic-structure/AcademicStructurePage'
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -21,6 +22,7 @@ export const AppRouter = () => (
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="academic-years" element={<AcademicYearsPage />} />
+          <Route path='academic-structure' element={<AcademicStructurePage />} />
         </Route>
       </Route>
 

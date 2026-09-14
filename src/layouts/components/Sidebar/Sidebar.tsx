@@ -48,7 +48,7 @@ const MENU_GROUPS: MenuGroup[] = [
           {
             id: 'academico-level-grade-section',
             label: 'Catálogo Base',
-            // path: '/admin/academic-structure',
+            path: '/admin/academic-structure',
           },
           {
             id: 'academico-aulas',
