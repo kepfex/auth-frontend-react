@@ -1,8 +1,9 @@
-import { BookOpen } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { BookOpen, Grid, Grid2X2, Layers, LayoutGrid, ListOrdered } from "lucide-react"
 
 export const AcademicStructurePage = () => {
-  return (
-    <div className="space-y-6">
+    return (
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-phoenix-gold/10">
@@ -15,6 +16,34 @@ export const AcademicStructurePage = () => {
                     </p>
                 </div>
             </div>
-    </div>
-  )
+
+            {/* Tabs */}
+            <Tabs defaultValue="levels">
+                <TabsList className="grid grid-cols-3 w-full max-w-md">
+                    <TabsTrigger value="levels">
+                        <Layers/>
+                        Niveles
+                    </TabsTrigger>
+                    <TabsTrigger value="grades">
+                        <ListOrdered/>
+                        Grados
+                    </TabsTrigger>
+                    <TabsTrigger value="sections">
+                        <LayoutGrid/>
+                        Secciones
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="levels" className="mt-6">
+                    {/* <LevelsTab /> */}
+                </TabsContent>
+                <TabsContent value="grades" className="mt-6">
+                    {/* <GradesTab /> */}
+                </TabsContent>
+                <TabsContent value="sections" className="mt-6">
+                    {/* <SectionsTab /> */}
+                </TabsContent>
+            </Tabs>
+        </div>
+    )
 }
