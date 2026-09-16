@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GradesTab } from "@/features/academic-structure/components/GradesTab"
 import { LevelsTab } from "@/features/academic-structure/components/LevelsTab"
 import { SectionsTab } from "@/features/academic-structure/components/SectionsTab"
-import { BookOpen, Grid, Grid2X2, Layers, LayoutGrid, ListOrdered } from "lucide-react"
+import { BookOpen, Layers, LayoutGrid, ListOrdered } from "lucide-react"
 
 export const AcademicStructurePage = () => {
     return (
