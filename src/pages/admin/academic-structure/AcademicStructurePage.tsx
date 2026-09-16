@@ -1,4 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { GradesTab } from "@/features/academic-structure/components/GradesTab"
+import { LevelsTab } from "@/features/academic-structure/components/LevelsTab"
+import { SectionsTab } from "@/features/academic-structure/components/SectionsTab"
 import { BookOpen, Grid, Grid2X2, Layers, LayoutGrid, ListOrdered } from "lucide-react"
 
 export const AcademicStructurePage = () => {
@@ -35,13 +38,13 @@ export const AcademicStructurePage = () => {
                 </TabsList>
 
                 <TabsContent value="levels" className="mt-6">
-                    {/* <LevelsTab /> */}
+                    <LevelsTab />
                 </TabsContent>
                 <TabsContent value="grades" className="mt-6">
-                    {/* <GradesTab /> */}
+                    <GradesTab />
                 </TabsContent>
                 <TabsContent value="sections" className="mt-6">
-                    {/* <SectionsTab /> */}
+                    <SectionsTab />
                 </TabsContent>
             </Tabs>
         </div>
