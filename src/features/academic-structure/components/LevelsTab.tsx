@@ -93,10 +93,23 @@ export const LevelsTab = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-xs font-medium border border-slate-200">
+        {/* <p className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-xs font-medium border border-slate-200">
           {levels.length} nivel{levels.length !== 1 ? "es" : ""} registrado
           {levels.length !== 1 ? "s" : ""}
-        </p>
+        </p> */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-semibold text-slate-800 tracking-tight">
+              Niveles de Formación
+            </h2>
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-xs font-medium border border-slate-200">
+              {levels.length} {levels.length === 1 ? "nivel" : "niveles"}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500">
+            Organiza la jerarquía formativa de la institución.
+          </p>
+        </div>
         {/* <Button
           size="sm"
           onClick={() => {
@@ -153,10 +166,11 @@ export const LevelsTab = () => {
                       <button
                         onClick={() => setDeleting(level)}
                         disabled={gradesCount > 0}
-                        className={`p-1.5 rounded-lg transition-colors ${gradesCount > 0
-                          ? "text-slate-300 cursor-not-allowed"
-                          : "text-slate-500 hover:text-red-600 hover:bg-red-50"
-                          }`}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          gradesCount > 0
+                            ? "text-slate-300 cursor-not-allowed"
+                            : "text-slate-500 hover:text-red-600 hover:bg-red-50"
+                        }`}
                         title={
                           gradesCount > 0
                             ? "No puedes eliminar un nivel con grados asociados"
@@ -244,21 +258,23 @@ export const LevelsTab = () => {
                     : "Nuevo nivel educativo"}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Define la nomenclatura y la secuencia dentro de la estructura escolar.
+                  Define la nomenclatura y la secuencia dentro de la estructura
+                  escolar.
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
-          <form id="level-form"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
+          <form id="level-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <div className="grid grid-cols-3 gap-3">
                 <Controller
                   name="order"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid} className="col-span-1">
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      className="col-span-1"
+                    >
                       <FieldLabel htmlFor="lv-order">Orden</FieldLabel>
                       <Input
                         {...field}
@@ -277,9 +293,16 @@ export const LevelsTab = () => {
                   name="code"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid} className="col-span-2">
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      className="col-span-2"
+                    >
                       <FieldLabel htmlFor="lv-code">Código</FieldLabel>
-                      <Input {...field} id="lv-code" placeholder="PRI, SEC, INI" />
+                      <Input
+                        {...field}
+                        id="lv-code"
+                        placeholder="PRI, SEC, INI"
+                      />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
                       )}
@@ -294,7 +317,9 @@ export const LevelsTab = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="lv-name">Nombre Oficial</FieldLabel>
-                    <Input {...field} id="lv-name"
+                    <Input
+                      {...field}
+                      id="lv-name"
                       placeholder="ej. Primaria, Secundaria, Inicial"
                     />
                     {fieldState.invalid && (
@@ -303,7 +328,6 @@ export const LevelsTab = () => {
                   </Field>
                 )}
               />
-
             </FieldGroup>
           </form>
           <DialogFooter>
@@ -350,9 +374,11 @@ export const LevelsTab = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel variant={'outline'} disabled={isRemoving}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel variant={"outline"} disabled={isRemoving}>
+              Cancelar
+            </AlertDialogCancel>
             <AlertDialogAction
-              variant={'destructive'}
+              variant={"destructive"}
               onClick={() =>
                 deleting &&
                 remove(deleting.id, { onSuccess: () => setDeleting(null) })
