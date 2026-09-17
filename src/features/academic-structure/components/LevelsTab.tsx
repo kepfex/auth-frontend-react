@@ -12,6 +12,7 @@ import {
   GraduationCapIcon,
   PencilIcon,
   PlusIcon,
+  Trash2Icon,
   TrashIcon,
 } from "lucide-react";
 import type { EducationalLevel } from "../types/academic-structure.types";
@@ -39,6 +40,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
@@ -151,11 +153,10 @@ export const LevelsTab = () => {
                       <button
                         onClick={() => setDeleting(level)}
                         disabled={gradesCount > 0}
-                        className={`p-1.5 rounded-lg transition-colors ${
-                          gradesCount > 0
-                            ? "text-slate-300 cursor-not-allowed"
-                            : "text-slate-500 hover:text-red-600 hover:bg-red-50"
-                        }`}
+                        className={`p-1.5 rounded-lg transition-colors ${gradesCount > 0
+                          ? "text-slate-300 cursor-not-allowed"
+                          : "text-slate-500 hover:text-red-600 hover:bg-red-50"
+                          }`}
                         title={
                           gradesCount > 0
                             ? "No puedes eliminar un nivel con grados asociados"
@@ -205,7 +206,7 @@ export const LevelsTab = () => {
               setEditing(null);
               setFormOpen(true);
             }}
-            className="group flex flex-col items-center justify-center gap-2.5 min-h-[160px] rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-5 text-slate-500 transition-all duration-200 hover:border-amber-400/80 hover:bg-amber-50/20 hover:text-slate-900"
+            className="group flex flex-col items-center justify-center gap-2.5 min-h-40 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-5 text-slate-500 transition-all duration-200 hover:border-amber-400/80 hover:bg-amber-50/20 hover:text-slate-900"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-sm group-hover:bg-amber-400 group-hover:border-amber-400 group-hover:text-slate-900 transition-all">
               <PlusIcon className="w-5 h-5 stroke-[2.5]" />
@@ -234,7 +235,7 @@ export const LevelsTab = () => {
           <DialogHeader>
             <div className="flex gap-4 items-center">
               <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm shrink-0 flex items-center justify-center">
-                  <GraduationCapIcon className="w-5 h-5" />
+                <GraduationCapIcon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0 pr-4">
                 <DialogTitle className="font-semibold text-base sm:text-lg">
@@ -248,46 +249,53 @@ export const LevelsTab = () => {
               </div>
             </div>
           </DialogHeader>
-          <form id="level-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="level-form"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <FieldGroup>
-              <Controller
-                name="code"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="lv-code">Código</FieldLabel>
-                    <Input {...field} id="lv-code" placeholder="PRI" />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
+              <div className="grid grid-cols-3 gap-3">
+                <Controller
+                  name="order"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid} className="col-span-1">
+                      <FieldLabel htmlFor="lv-order">Orden</FieldLabel>
+                      <Input
+                        {...field}
+                        id="lv-order"
+                        type="number"
+                        min={1}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="code"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid} className="col-span-2">
+                      <FieldLabel htmlFor="lv-code">Código</FieldLabel>
+                      <Input {...field} id="lv-code" placeholder="PRI, SEC, INI" />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </div>
+
               <Controller
                 name="name"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="lv-name">Nombre</FieldLabel>
-                    <Input {...field} id="lv-name" placeholder="Primaria" />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="order"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="lv-order">Orden</FieldLabel>
-                    <Input
-                      {...field}
-                      id="lv-order"
-                      type="number"
-                      min={1}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    <FieldLabel htmlFor="lv-name">Nombre Oficial</FieldLabel>
+                    <Input {...field} id="lv-name"
+                      placeholder="ej. Primaria, Secundaria, Inicial"
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -295,6 +303,7 @@ export const LevelsTab = () => {
                   </Field>
                 )}
               />
+
             </FieldGroup>
           </form>
           <DialogFooter>
@@ -328,8 +337,11 @@ export const LevelsTab = () => {
         open={!!deleting}
         onOpenChange={(v) => !v && setDeleting(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent size="sm">
           <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+              <Trash2Icon />
+            </AlertDialogMedia>
             <AlertDialogTitle>
               ¿Eliminar nivel "{deleting?.name}"?
             </AlertDialogTitle>
@@ -338,9 +350,9 @@ export const LevelsTab = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel variant={'outline'} disabled={isRemoving}>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-white"
+              variant={'destructive'}
               onClick={() =>
                 deleting &&
                 remove(deleting.id, { onSuccess: () => setDeleting(null) })
