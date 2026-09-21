@@ -91,8 +91,8 @@ export const LevelsTab = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 pt-1">
+      <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-800">
         {/* <p className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-xs font-medium border border-slate-200">
           {levels.length} nivel{levels.length !== 1 ? "es" : ""} registrado
           {levels.length !== 1 ? "s" : ""}
@@ -137,7 +137,7 @@ export const LevelsTab = () => {
             const formattedOrder = String(level.order).padStart(2, "0");
             return (
               <div
-                id={level.code}
+                key={level.code}
                 className="group relative rounded-2xl border border-slate-200/80 bg-white p-5 hover:border-primary/60 hover:shadow-lg hover:shadow-primary-500/5 transition-all duration-200 flex flex-col justify-between"
               >
                 <div>

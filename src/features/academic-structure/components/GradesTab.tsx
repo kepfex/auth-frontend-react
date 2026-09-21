@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Layers, ListOrdered, Pencil, Plus, Trash2, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -46,21 +46,24 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
 export const GradesTab = () => {
   const { data: levels = [] } = useLevels();
-  const { data: grades = [], isLoading } = useGrades();
+  const { data: grades = [], isLoading: isLoadingGrades } = useGrades();
   const { mutate: create, isPending: isCreating } = useCreateGrade();
   const { mutate: update, isPending: isUpdating } = useUpdateGrade();
   const { mutate: remove, isPending: isRemoving } = useDeleteGrade();
 
+  // Estados interactivos para filtros y modales
+  const [filterLevel, setFilterLevel] = useState<string>("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Grade | null>(null);
   const [deleting, setDeleting] = useState<Grade | null>(null);
-  const [filterLevel, setFilterLevel] = useState<string>("all");
-
+  
+  // Estado del formulario
   const form = useForm<GradeFormData>({
     resolver: zodResolver(gradeSchema),
     defaultValues: {
@@ -79,20 +82,32 @@ export const GradesTab = () => {
         name: editing.name,
         order: editing.order,
       });
-    } else {
-      form.reset({
-        educational_level_id: levels[0]?.id ?? 0,
-        code: "",
-        name: "",
-        order: 1,
-      });
     }
   }, [editing, formOpen]);
 
-  const filteredGrades =
-    filterLevel === "all"
-      ? grades
-      : grades.filter((g) => g.educational_level_id === Number(filterLevel));
+  const handleOpenCreateForLevel = (levelId?: number) => {
+    setEditing(null);
+    const targetLvlId =
+      levelId ?? (filterLevel !== "all" ? Number(filterLevel) : levels[0]?.id ?? 1);
+    const targetLvl = levels.find((l) => l.id === targetLvlId);
+    const countInLevel = grades.filter(
+      (g) => g.educational_level_id === targetLvlId
+    ).length;
+    const nextOrder = countInLevel + 1;
+
+    form.reset({
+      educational_level_id: targetLvlId,
+      order: nextOrder,
+      code: targetLvl ? `${targetLvl.code}-${String(nextOrder).padStart(2, "0")}` : "",
+      name: "",
+    });
+    setFormOpen(true);
+  };
+
+  const filteredLevels =
+    filterLevel == "all"
+      ? levels
+      : levels.filter(lvl => filterLevel === String(lvl.id))
 
   const onSubmit = (data: GradeFormData) => {
     if (editing) {
@@ -111,21 +126,8 @@ export const GradesTab = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        {/* Filtro por nivel */}
-        {/* <Select value={filterLevel} onValueChange={setFilterLevel}>
-                    <SelectTrigger className="w-48">
-                        <SelectValue placeholder="Todos los niveles" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">Todos los niveles</SelectItem>
-                        {levels.map(l => (
-                            <SelectItem key={l.id} value={String(l.id)}>{l.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select> */}
-
+    <div className="space-y-6 pt-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-base font-semibold text-slate-800 tracking-tight">
@@ -152,141 +154,187 @@ export const GradesTab = () => {
         </Button>
       </div>
 
-      {isLoading && (
-        <p className="text-sm text-muted-foreground py-8 text-center">
-          Cargando...
-        </p>
+      {isLoadingGrades && (
+        <div className="flex flex-col items-center justify-center h-64 rounded-2xl border border-dashed border-border/60 text-muted-foreground gap-2">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-phoenix-gold border-t-transparent" />
+          <span className="text-xs">Cargando registros...</span>
+        </div>
       )}
 
-      {/* Barra de Navegación por Filtros de Píldora (Segmented Pills) + Buscador */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-slate-200 shadow-xs">
-        {/* Píldoras de Nivel */}
-        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
-          {/* Píldora "Todos" */}
-          <button
-            onClick={() => setFilterLevel("all")}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
-              filterLevel === "all"
-                ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            }`}
-          >
-            <span>Todos</span>
-            <span
-              className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${
-                filterLevel === "all"
-                  ? "bg-amber-600/30 text-slate-950 font-bold"
-                  : "bg-slate-200/80 text-slate-600"
-              }`}
-            >
-              {grades.length}
-            </span>
-          </button>
-
-          {/* Píldora para cada nivel disponible */}
-          {levels.map((lvl) => {
-            const count = grades.filter((g) => g.educational_level_id === lvl.id).length;
-            const isSelected = filterLevel === String(lvl.id);
-            return (
+      {!isLoadingGrades && grades.length !== 0 && (
+        <>
+          {/* Píldoras de Filtro (Segmented Pills) */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-slate-200 shadow-xs">
+            {/* Píldoras de Nivel */}
+            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
+              {/* Píldora "Todos" */}
               <button
-                key={lvl.id}
-                onClick={() => setFilterLevel(String(lvl.id))}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
-                  isSelected
-                    ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                }`}
-              >
-                <span>{lvl.name}</span>
-                <span
-                  className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${
-                    isSelected
-                      ? "bg-amber-600/30 text-slate-950 font-bold"
-                      : "bg-slate-200/80 text-slate-600"
+                onClick={() => setFilterLevel("all")}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${filterLevel === "all"
+                  ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   }`}
+              >
+                <span>Todos</span>
+                <span
+                  className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${filterLevel === "all"
+                    ? "bg-amber-600/30 text-slate-950 font-bold"
+                    : "bg-slate-200/80 text-slate-600"
+                    }`}
                 >
-                  {count}
+                  {grades.length}
                 </span>
               </button>
-            );
-          })}
-        </div>
-      </div>
 
-      <div className="rounded-xl border border-border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="text-left px-4 py-3 font-medium w-16">Orden</th>
-              <th className="text-left px-4 py-3 font-medium w-24">Código</th>
-              <th className="text-left px-4 py-3 font-medium">Grado</th>
-              <th className="text-left px-4 py-3 font-medium">Nivel</th>
-              <th className="text-right px-4 py-3 font-medium w-24">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredGrades.map((grade) => (
-              <tr
-                key={grade.id}
-                className="border-t border-border hover:bg-muted/30 transition-colors"
-              >
-                <td className="px-4 py-3">
-                  <Badge variant="outline" className="text-xs">
-                    {grade.order}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                  {grade.code}
-                </td>
-                <td className="px-4 py-3 font-medium">{grade.name}</td>
-                <td className="px-4 py-3">
-                  <Badge variant="secondary" className="text-xs">
-                    {grade.educational_level?.name ??
-                      levels.find((l) => l.id === grade.educational_level_id)
-                        ?.name ??
-                      "—"}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-end gap-1">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-7 w-7 hover:text-phoenix-gold"
-                      onClick={() => {
-                        setEditing(grade);
-                        setFormOpen(true);
-                      }}
+              {/* Píldora para cada nivel disponible */}
+              {levels.map((lvl) => {
+                const count = grades.filter((g) => g.educational_level_id === lvl.id).length;
+                const isSelected = filterLevel === String(lvl.id);
+                return (
+                  <button
+                    key={lvl.id}
+                    onClick={() => setFilterLevel(String(lvl.id))}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${isSelected
+                      ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      }`}
+                  >
+                    <span>{lvl.name}</span>
+                    <span
+                      className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${isSelected
+                        ? "bg-amber-600/30 text-slate-950 font-bold"
+                        : "bg-slate-200/80 text-slate-600"
+                        }`}
                     >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-7 w-7 hover:text-destructive"
-                      onClick={() => setDeleting(grade)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {filteredGrades.length === 0 && !isLoading && (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="text-center py-8 text-muted-foreground text-sm"
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Contenedores agrupados por nivel */}
+          <div className="space-y-4">
+            {filteredLevels.map(level => {
+              const lvlGrades = grades.filter(g => g.educational_level_id === level.id)
+
+              return (
+                <div
+                  key={level.id}
+                  className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs transition-all hover:border-amber-400/50"
                 >
-                  Sin grados registrados
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                  {/* Cabecera del nivel */}
+                  <div className="px-5 py-3.5 bg-slate-50/80 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/50 tracking-wider">
+                        {level.code}
+                      </span>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+                        {level.name}
+                      </h3>
+                      <span className="text-xs text-slate-500 font-normal">
+                        — {lvlGrades.length} {lvlGrades.length === 1 ? "grado" : "grados"}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCreateForLevel(level.id)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors shadow-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 stroke-[2.5]" />
+                      <span>Añadir a {level.name}</span>
+                    </button>
+                  </div>
+
+                  {/* Estado vacío o listado de grados */}
+                  {lvlGrades.length === 0 ? (
+                    <div className="py-8 px-6 text-center space-y-2">
+                      <div className="w-10 h-10 mx-auto rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-600 flex items-center justify-center border border-amber-200/50 dark:border-amber-800/40">
+                        <Layers className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                        No hay grados registrados en {level.name}
+                      </p>
+                      <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                        Comienza definiendo los cursos o años lectivos para este nivel.
+                      </p>
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          // onClick={() => handleOpenCreateForLevel(level.id)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-900 bg-amber-400 hover:bg-amber-500 rounded-xl transition-all"
+                        >
+                          <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+                          <span>Crear primer grado</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {lvlGrades.map((grade) => {
+                        const formattedOrder = String(grade.order).padStart(2, "0");
+                        return (
+                          <div
+                            key={grade.id}
+                            className="px-5 py-3 hover:bg-amber-50/25 dark:hover:bg-slate-800/40 transition-colors flex items-center justify-between gap-4 group"
+                          >
+                            <div className="flex items-center gap-3.5 min-w-0">
+                              <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300 shrink-0 border border-slate-200/70 dark:border-slate-700">
+                                #{formattedOrder}
+                              </span>
+
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 tracking-wide">
+                                    {grade.code}
+                                  </span>
+                                  <span className="text-slate-300 dark:text-slate-600">•</span>
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
+                                    {grade.name}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                  Bloque curricular de {level.name}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity shrink-0">
+                              <button
+                                type="button"
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-800 transition-colors"
+                                onClick={() => {
+                                  setEditing(grade);
+                                  setFormOpen(true);
+                                }}
+                                title="Editar grado"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-800 transition-colors"
+                                onClick={() => setDeleting(grade)}
+                                title="Eliminar grado"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
+
+
 
       {/* Form Dialog */}
       <Dialog
@@ -300,12 +348,21 @@ export const GradesTab = () => {
       >
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>
-              {editing ? `Editar ${editing.name}` : "Nuevo grado"}
-            </DialogTitle>
-            <DialogDescription>
-              El código debe ser único en todo el sistema
-            </DialogDescription>
+            <div className="flex gap-4 items-center">
+              <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm shrink-0 flex items-center justify-center">
+                <ListOrdered className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0 pr-4">
+                <DialogTitle className="font-semibold text-base sm:text-lg">
+                  {editing
+                    ? `Editar ${editing.name}`
+                    : "Nuevo grado escolar"}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  El código debe ser único dentro de la estructura escolar.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
           <form id="grade-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
@@ -325,7 +382,7 @@ export const GradesTab = () => {
                       <SelectContent>
                         {levels.map((l) => (
                           <SelectItem key={l.id} value={String(l.id)}>
-                            {l.name}
+                            {l.name} ({l.code})
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -336,53 +393,61 @@ export const GradesTab = () => {
                   </Field>
                 )}
               />
-              <Controller
-                name="code"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="gr-code">Código</FieldLabel>
-                    <Input {...field} id="gr-code" placeholder="PRI-01" />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Controller
+                    name="order"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="gr-order">
+                          Orden
+                        </FieldLabel>
+                        <Input
+                          {...field}
+                          id="gr-order"
+                          type="number"
+                          min={1}
+                          onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
                     )}
-                  </Field>
-                )}
-              />
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Controller
+                    name="code"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="gr-code">Código</FieldLabel>
+                        <Input {...field} id="gr-code" placeholder="PRI-01" />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                </div>
+              </div>
+
               <Controller
                 name="name"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="gr-name">Nombre</FieldLabel>
-                    <Input {...field} id="gr-name" placeholder="Primero" />
+                    <FieldLabel htmlFor="gr-name">Nombre del grado</FieldLabel>
+                    <Input {...field} id="gr-name" placeholder="ej. Primero, 3 años, Primer Año" />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
                   </Field>
                 )}
               />
-              <Controller
-                name="order"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="gr-order">
-                      Orden dentro del nivel
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id="gr-order"
-                      type="number"
-                      min={1}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
+
             </FieldGroup>
           </form>
           <DialogFooter>
@@ -392,6 +457,7 @@ export const GradesTab = () => {
                 setFormOpen(false);
                 setEditing(null);
               }}
+              disabled={isCreating || isUpdating}
             >
               Cancelar
             </Button>
@@ -416,8 +482,11 @@ export const GradesTab = () => {
         open={!!deleting}
         onOpenChange={(v) => !v && setDeleting(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent size="sm">
           <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+              <Trash2Icon />
+            </AlertDialogMedia>
             <AlertDialogTitle>
               ¿Eliminar grado "{deleting?.name}"?
             </AlertDialogTitle>
@@ -427,9 +496,9 @@ export const GradesTab = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel variant={"outline"} disabled={isRemoving}>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-white"
+              variant={"destructive"}
               disabled={isRemoving}
               onClick={() =>
                 deleting &&
@@ -441,6 +510,6 @@ export const GradesTab = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </div >
   );
 };
