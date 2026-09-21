@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Layers, ListOrdered, Pencil, Plus, Trash2, Trash2Icon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
