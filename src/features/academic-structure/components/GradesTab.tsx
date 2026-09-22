@@ -48,6 +48,7 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 export const GradesTab = () => {
   const { data: levels = [] } = useLevels();
@@ -61,7 +62,7 @@ export const GradesTab = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Grade | null>(null);
   const [deleting, setDeleting] = useState<Grade | null>(null);
-  
+
   // Estado del formulario
   const form = useForm<GradeFormData>({
     resolver: zodResolver(gradeSchema),
@@ -81,7 +82,7 @@ export const GradesTab = () => {
         name: editing.name,
         order: editing.order,
       });
-    }
+    } else form.reset({ educational_level_id: -1, code: "", name: "", order: 0})
   }, [editing, formOpen]);
 
   const handleOpenCreateForLevel = (levelId?: number) => {
@@ -141,16 +142,19 @@ export const GradesTab = () => {
           </p>
         </div>
 
-        <Button
-          size="sm"
-          onClick={() => {
-            setEditing(null);
-            setFormOpen(true);
-          }}
-          className="gap-2 bg-phoenix-gold hover:bg-phoenix-orange text-obsidian"
-        >
-          <Plus className="h-4 w-4" /> Nuevo grado
-        </Button>
+        {grades.length !== 0 && levels.length > 1 && (
+          <Button
+            size="sm"
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+            className="gap-2 bg-phoenix-gold hover:bg-phoenix-orange text-obsidian"
+          >
+            <Plus className="h-4 w-4" /> Nuevo grado
+          </Button>
+        )}
+
       </div>
 
       {isLoadingGrades && (
@@ -163,55 +167,57 @@ export const GradesTab = () => {
       {!isLoadingGrades && grades.length !== 0 && (
         <>
           {/* Píldoras de Filtro (Segmented Pills) */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-slate-200 shadow-xs">
-            {/* Píldoras de Nivel */}
-            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
-              {/* Píldora "Todos" */}
-              <button
-                onClick={() => setFilterLevel("all")}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${filterLevel === "all"
-                  ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  }`}
-              >
-                <span>Todos</span>
-                <span
-                  className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${filterLevel === "all"
-                    ? "bg-amber-600/30 text-slate-950 font-bold"
-                    : "bg-slate-200/80 text-slate-600"
+          {levels.length > 1 && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-slate-200 shadow-xs">
+              {/* Píldoras de Nivel */}
+              <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
+                {/* Píldora "Todos" */}
+                <button
+                  onClick={() => setFilterLevel("all")}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${filterLevel === "all"
+                    ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                     }`}
                 >
-                  {grades.length}
-                </span>
-              </button>
-
-              {/* Píldora para cada nivel disponible */}
-              {levels.map((lvl) => {
-                const count = grades.filter((g) => g.educational_level_id === lvl.id).length;
-                const isSelected = filterLevel === String(lvl.id);
-                return (
-                  <button
-                    key={lvl.id}
-                    onClick={() => setFilterLevel(String(lvl.id))}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${isSelected
-                      ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  <span>Todos</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${filterLevel === "all"
+                      ? "bg-amber-600/30 text-slate-950 font-bold"
+                      : "bg-slate-200/80 text-slate-600"
                       }`}
                   >
-                    <span>{lvl.name}</span>
-                    <span
-                      className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${isSelected
-                        ? "bg-amber-600/30 text-slate-950 font-bold"
-                        : "bg-slate-200/80 text-slate-600"
+                    {grades.length}
+                  </span>
+                </button>
+
+                {/* Píldora para cada nivel disponible */}
+                {levels.map((lvl) => {
+                  const count = grades.filter((g) => g.educational_level_id === lvl.id).length;
+                  const isSelected = filterLevel === String(lvl.id);
+                  return (
+                    <button
+                      key={lvl.id}
+                      onClick={() => setFilterLevel(String(lvl.id))}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${isSelected
+                        ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                         }`}
                     >
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
+                      <span>{lvl.name}</span>
+                      <span
+                        className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${isSelected
+                          ? "bg-amber-600/30 text-slate-950 font-bold"
+                          : "bg-slate-200/80 text-slate-600"
+                          }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Contenedores agrupados por nivel */}
           <div className="space-y-4">
@@ -333,7 +339,18 @@ export const GradesTab = () => {
         </>
       )}
 
-
+      {grades.length === 0 && !isLoadingGrades && (
+        <EmptyState
+          title="Sin grados configurados"
+          description="Cada grado debe estar vinculado a un nivel académico para poder matricular alumnos y abrir secciones."
+          actionLabel="Agregar grado ahora"
+          actionIcon={Plus}
+          onAction={() => {
+            setEditing(null);
+            setFormOpen(true);
+          }}
+        />
+      )}
 
       {/* Form Dialog */}
       <Dialog

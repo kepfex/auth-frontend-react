@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { HeartHandshakeIcon, PencilIcon, Plus, PlusIcon, SparklesIcon, TrashIcon, TypeIcon, X } from 'lucide-react'
+import { HeartHandshakeIcon, NotepadTextDashed, PencilIcon, Plus, PlusIcon, SparklesIcon, TrashIcon, TypeIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useSections, useCreateSection, useDeleteSection } from '../hooks/useAcademicStructure'
 import { sectionSchema, type SectionFormData } from '../schemas/academic-structure.schema'
 import type { Section } from '../types/academic-structure.types'
+import { EmptyState } from '@/components/shared/EmptyState'
 
 export const SectionsTab = () => {
     const { data: sections = [], isLoading } = useSections()
@@ -48,10 +49,12 @@ export const SectionsTab = () => {
                     </p>
                 </div>
 
-                <Button size="sm" onClick={() => setFormOpen(true)}
-                    className="gap-2 bg-phoenix-gold hover:bg-phoenix-orange text-obsidian">
-                    <PlusIcon className="h-4 w-4" /> Nueva sección
-                </Button>
+                {sections.length !== 0 && (
+                    <Button size="sm" onClick={() => setFormOpen(true)}
+                        className="gap-2 bg-phoenix-gold hover:bg-phoenix-orange text-obsidian">
+                        <PlusIcon className="h-4 w-4" /> Nueva sección
+                    </Button>
+                )}
             </div>
 
             {isLoading && (
@@ -109,7 +112,7 @@ export const SectionsTab = () => {
                                 <button
                                     type="button"
                                     onClick={() => setFormOpen(true)}
-                                    className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 hover:bg-amber-50/20 text-slate-400 hover:text-slate-900 transition-all cursor-pointer min-h-[90px]"
+                                    className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 hover:bg-amber-50/20 text-slate-400 hover:text-slate-900 transition-all cursor-pointer min-h-22.5"
                                 >
                                     <PlusIcon className="w-4 h-4" />
                                     <span className="text-[11px] font-medium">Nueva</span>
@@ -175,7 +178,7 @@ export const SectionsTab = () => {
                                 <button
                                     type="button"
                                     //   onClick={() => handleOpenCreateSection()}
-                                    className="flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 border-dashed border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/20 text-slate-400 hover:text-slate-900 transition-all cursor-pointer min-h-[58px]"
+                                    className="flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 border-dashed border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/20 text-slate-400 hover:text-slate-900 transition-all cursor-pointer min-h-14.5"
                                 >
                                     <PlusIcon className="w-4 h-4" />
                                     <span className="text-xs font-semibold">Añadir otro valor</span>
@@ -187,7 +190,13 @@ export const SectionsTab = () => {
             )}
 
             {sections.length === 0 && !isLoading && (
-                <p className="text-muted-foreground text-sm m-auto">Sin secciones registradas</p>
+                <EmptyState
+                    title="Sin registros en esta lista"
+                    description="Comienza agregando los literales o nombres de sección que utilizará tu institución educativa."
+                    actionLabel="Agregar sección ahora"
+                    actionIcon={Plus}
+                    onAction={() => setFormOpen(true)}
+                />
             )}
 
             {/* Form Dialog */}

@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { gradesApi, levelsApi, sectionsApi } from "../api/academic-structure.api";
 import { toast } from "sonner";
 import type { CreateGradeRequest, CreateSectionRequest, UpdateGradeRequest, UpdateLevelRequest } from "../types/academic-structure.types";
+import type { ErrorResponse } from "@/shared/types/shared.types";
+import type { AxiosError } from "axios";
 
 export const STRUCTURE_KEYS = {
     levels: ['educational-levels'] as const,
@@ -13,11 +15,15 @@ export const STRUCTURE_KEYS = {
 export const useLevels = () =>
     useQuery({ queryKey: STRUCTURE_KEYS.levels, queryFn: levelsApi.getAll, staleTime: 1000 * 60 * 30 })
 
+// -- POST Crear un nuevo nivel educativo
 export const useCreateLevel = () => {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: levelsApi.create,
-        onSuccess: (l) => { qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.levels }); toast.success(`Nivel "${l.name}" creado`) },
+        onSuccess: (l) => {
+            qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.levels });
+            toast.success(`Nivel "${l.name}" creado`)
+        },
         onError: (e: any) => toast.error(e?.response?.data?.message ?? 'Error al crear nivel'),
     })
 }
@@ -35,8 +41,18 @@ export const useDeleteLevel = () => {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: levelsApi.remove,
-        onSuccess: () => { qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.levels }); toast.success('Nivel eliminado') },
-        onError: (e: any) => toast.error(e?.response?.data?.message ?? 'No se puede eliminar — tiene grados asociados'),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.levels });
+            toast.success('Nivel eliminado')
+        },
+        onError: (error: AxiosError<ErrorResponse>) => {
+            const msg =
+                error?.response?.data?.message ??
+                error?.response?.data?.error ??
+                'No se puede eliminar — tiene grados asociados';
+            toast.error(msg)
+            console.log(error?.response?.data);
+        },
     })
 }
 

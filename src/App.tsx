@@ -13,7 +13,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AppRouter />
-        <Toaster id="canvas" position="bottom-right"richColors />
+        <Toaster richColors />
       </ThemeProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
