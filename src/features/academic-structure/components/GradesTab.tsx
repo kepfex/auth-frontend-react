@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   useCreateGrade,
   useDeleteGrade,
@@ -21,7 +21,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Layers, ListOrdered, Pencil, Plus, Trash2, Trash2Icon } from "lucide-react";
+import {
+  Layers,
+  ListOrdered,
+  Pencil,
+  Plus,
+  Trash2,
+  Trash2Icon,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -51,6 +58,13 @@ import {
 import { EmptyState } from "@/components/shared/EmptyState";
 
 export const GradesTab = () => {
+  const EMPTY_GRADE_FORM: GradeFormData = {
+    educational_level_id: 0,
+    code: "",
+    name: "",
+    order: 1,
+  };
+
   const { data: levels = [] } = useLevels();
   const { data: grades = [], isLoading: isLoadingGrades } = useGrades();
   const { mutate: create, isPending: isCreating } = useCreateGrade();
@@ -66,48 +80,61 @@ export const GradesTab = () => {
   // Estado del formulario
   const form = useForm<GradeFormData>({
     resolver: zodResolver(gradeSchema),
-    defaultValues: {
-      educational_level_id: 0,
-      code: "",
-      name: "",
-      order: 1,
-    },
+    defaultValues: EMPTY_GRADE_FORM,
   });
 
-  useEffect(() => {
-    if (editing) {
-      form.reset({
-        educational_level_id: editing.educational_level_id,
-        code: editing.code,
-        name: editing.name,
-        order: editing.order,
-      });
-    } else form.reset({ educational_level_id: -1, code: "", name: "", order: 0})
-  }, [editing, formOpen]);
-
-  const handleOpenCreateForLevel = (levelId?: number) => {
+  // GENERAL
+  const handleOpenCreate = () => {
     setEditing(null);
-    const targetLvlId =
-      levelId ?? (filterLevel !== "all" ? Number(filterLevel) : levels[0]?.id ?? 1);
-    const targetLvl = levels.find((l) => l.id === targetLvlId);
-    const countInLevel = grades.filter(
-      (g) => g.educational_level_id === targetLvlId
-    ).length;
-    const nextOrder = countInLevel + 1;
+
+    form.reset(EMPTY_GRADE_FORM);
+
+    setFormOpen(true);
+  };
+
+  // AGRUPADO POR NIVEL
+  const handleOpenCreateForLevel = (levelId: number) => {
+    setEditing(null);
+
+    const level = levels.find((level) => level.id === levelId);
+
+    if (!level) return;
+
+    const gradesInLevel = grades.filter(
+      (grade) => grade.educational_level_id === levelId,
+    );
+
+    // si Primaria tiene 1, 2, genera 3; si tiene 1, 2, 4, genera 5.
+    const nextOrder = Math.max(0, ...gradesInLevel.map((grade) => grade.order)) + 1;
 
     form.reset({
-      educational_level_id: targetLvlId,
-      order: nextOrder,
-      code: targetLvl ? `${targetLvl.code}-${String(nextOrder).padStart(2, "0")}` : "",
+      educational_level_id: level.id,
+      code: `${level.code}-${String(nextOrder).padStart(2, "0")}`,
       name: "",
+      order: nextOrder,
     });
+
+    setFormOpen(true);
+  };
+
+  // EDITAR
+  const handleOpenEdit = (grade: Grade) => {
+    setEditing(grade);
+
+    form.reset({
+      educational_level_id: grade.educational_level_id,
+      code: grade.code,
+      name: grade.name,
+      order: grade.order,
+    });
+
     setFormOpen(true);
   };
 
   const filteredLevels =
     filterLevel == "all"
       ? levels
-      : levels.filter(lvl => filterLevel === String(lvl.id))
+      : levels.filter((lvl) => filterLevel === String(lvl.id));
 
   const onSubmit = (data: GradeFormData) => {
     if (editing) {
@@ -145,16 +172,12 @@ export const GradesTab = () => {
         {grades.length !== 0 && levels.length > 1 && (
           <Button
             size="sm"
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
+            onClick={handleOpenCreate}
             className="gap-2 bg-phoenix-gold hover:bg-phoenix-orange text-obsidian"
           >
             <Plus className="h-4 w-4" /> Nuevo grado
           </Button>
         )}
-
       </div>
 
       {isLoadingGrades && (
@@ -174,17 +197,19 @@ export const GradesTab = () => {
                 {/* Píldora "Todos" */}
                 <button
                   onClick={() => setFilterLevel("all")}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${filterLevel === "all"
-                    ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                    }`}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
+                    filterLevel === "all"
+                      ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  }`}
                 >
                   <span>Todos</span>
                   <span
-                    className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${filterLevel === "all"
-                      ? "bg-amber-600/30 text-slate-950 font-bold"
-                      : "bg-slate-200/80 text-slate-600"
-                      }`}
+                    className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${
+                      filterLevel === "all"
+                        ? "bg-amber-600/30 text-slate-950 font-bold"
+                        : "bg-slate-200/80 text-slate-600"
+                    }`}
                   >
                     {grades.length}
                   </span>
@@ -192,23 +217,27 @@ export const GradesTab = () => {
 
                 {/* Píldora para cada nivel disponible */}
                 {levels.map((lvl) => {
-                  const count = grades.filter((g) => g.educational_level_id === lvl.id).length;
+                  const count = grades.filter(
+                    (g) => g.educational_level_id === lvl.id,
+                  ).length;
                   const isSelected = filterLevel === String(lvl.id);
                   return (
                     <button
                       key={lvl.id}
                       onClick={() => setFilterLevel(String(lvl.id))}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${isSelected
-                        ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
-                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                        }`}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
+                        isSelected
+                          ? "bg-amber-500 text-slate-950 font-semibold shadow-xs"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      }`}
                     >
                       <span>{lvl.name}</span>
                       <span
-                        className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${isSelected
-                          ? "bg-amber-600/30 text-slate-950 font-bold"
-                          : "bg-slate-200/80 text-slate-600"
-                          }`}
+                        className={`px-1.5 py-0.2 rounded-md font-mono text-[10px] ${
+                          isSelected
+                            ? "bg-amber-600/30 text-slate-950 font-bold"
+                            : "bg-slate-200/80 text-slate-600"
+                        }`}
                       >
                         {count}
                       </span>
@@ -221,8 +250,10 @@ export const GradesTab = () => {
 
           {/* Contenedores agrupados por nivel */}
           <div className="space-y-4">
-            {filteredLevels.map(level => {
-              const lvlGrades = grades.filter(g => g.educational_level_id === level.id)
+            {filteredLevels.map((level) => {
+              const lvlGrades = grades.filter(
+                (g) => g.educational_level_id === level.id,
+              );
 
               return (
                 <div
@@ -239,7 +270,8 @@ export const GradesTab = () => {
                         {level.name}
                       </h3>
                       <span className="text-xs text-slate-500 font-normal">
-                        — {lvlGrades.length} {lvlGrades.length === 1 ? "grado" : "grados"}
+                        — {lvlGrades.length}{" "}
+                        {lvlGrades.length === 1 ? "grado" : "grados"}
                       </span>
                     </div>
 
@@ -263,12 +295,13 @@ export const GradesTab = () => {
                         No hay grados registrados en {level.name}
                       </p>
                       <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
-                        Comienza definiendo los cursos o años lectivos para este nivel.
+                        Comienza definiendo los cursos o años lectivos para este
+                        nivel.
                       </p>
                       <div className="pt-1">
                         <button
                           type="button"
-                          // onClick={() => handleOpenCreateForLevel(level.id)}
+                          onClick={() => handleOpenCreateForLevel(level.id)}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-900 bg-amber-400 hover:bg-amber-500 rounded-xl transition-all"
                         >
                           <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -279,7 +312,10 @@ export const GradesTab = () => {
                   ) : (
                     <div className="divide-y divide-slate-100 dark:divide-slate-800">
                       {lvlGrades.map((grade) => {
-                        const formattedOrder = String(grade.order).padStart(2, "0");
+                        const formattedOrder = String(grade.order).padStart(
+                          2,
+                          "0",
+                        );
                         return (
                           <div
                             key={grade.id}
@@ -295,7 +331,9 @@ export const GradesTab = () => {
                                   <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 tracking-wide">
                                     {grade.code}
                                   </span>
-                                  <span className="text-slate-300 dark:text-slate-600">•</span>
+                                  <span className="text-slate-300 dark:text-slate-600">
+                                    •
+                                  </span>
                                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
                                     {grade.name}
                                   </span>
@@ -310,10 +348,7 @@ export const GradesTab = () => {
                               <button
                                 type="button"
                                 className="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-slate-800 transition-colors"
-                                onClick={() => {
-                                  setEditing(grade);
-                                  setFormOpen(true);
-                                }}
+                                onClick={() => handleOpenEdit(grade)}
                                 title="Editar grado"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
@@ -333,7 +368,7 @@ export const GradesTab = () => {
                     </div>
                   )}
                 </div>
-              )
+              );
             })}
           </div>
         </>
@@ -370,9 +405,7 @@ export const GradesTab = () => {
               </div>
               <div className="flex-1 min-w-0 pr-4">
                 <DialogTitle className="font-semibold text-base sm:text-lg">
-                  {editing
-                    ? `Editar ${editing.name}`
-                    : "Nuevo grado escolar"}
+                  {editing ? `Editar ${editing.name}` : "Nuevo grado escolar"}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   El código debe ser único dentro de la estructura escolar.
@@ -389,7 +422,7 @@ export const GradesTab = () => {
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>Nivel educativo</FieldLabel>
                     <Select
-                      value={String(field.value)}
+                      value={field.value > 0 ? String(field.value) : ""}
                       onValueChange={(v) => field.onChange(Number(v))}
                     >
                       <SelectTrigger>
@@ -416,15 +449,15 @@ export const GradesTab = () => {
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="gr-order">
-                          Orden
-                        </FieldLabel>
+                        <FieldLabel htmlFor="gr-order">Orden</FieldLabel>
                         <Input
                           {...field}
                           id="gr-order"
                           type="number"
                           min={1}
-                          onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
                         />
                         {fieldState.invalid && (
                           <FieldError errors={[fieldState.error]} />
@@ -456,14 +489,17 @@ export const GradesTab = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="gr-name">Nombre del grado</FieldLabel>
-                    <Input {...field} id="gr-name" placeholder="ej. Primero, 3 años, Primer Año" />
+                    <Input
+                      {...field}
+                      id="gr-name"
+                      placeholder="ej. Primero, 3 años, Primer Año"
+                    />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
                   </Field>
                 )}
               />
-
             </FieldGroup>
           </form>
           <DialogFooter>
@@ -512,7 +548,9 @@ export const GradesTab = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel variant={"outline"} disabled={isRemoving}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel variant={"outline"} disabled={isRemoving}>
+              Cancelar
+            </AlertDialogCancel>
             <AlertDialogAction
               variant={"destructive"}
               disabled={isRemoving}
@@ -526,6 +564,6 @@ export const GradesTab = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div >
+    </div>
   );
 };

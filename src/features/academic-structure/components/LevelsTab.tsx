@@ -93,10 +93,7 @@ export const LevelsTab = () => {
   return (
     <div className="space-y-6 pt-1">
       <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-800">
-        {/* <p className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-xs font-medium border border-slate-200">
-          {levels.length} nivel{levels.length !== 1 ? "es" : ""} registrado
-          {levels.length !== 1 ? "s" : ""}
-        </p> */}
+
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h2 className="text-base font-semibold text-slate-800 tracking-tight">
