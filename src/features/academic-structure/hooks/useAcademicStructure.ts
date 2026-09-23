@@ -95,6 +95,7 @@ export const useCreateGrade = () => {
     mutationFn: (p: CreateGradeRequest) => gradesApi.create(p),
     onSuccess: (g) => {
       qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.grades });
+      qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.levels });
       toast.success(`Grado "${g.name}" creado`);
     },
     onError: (e: any) =>
@@ -114,6 +115,7 @@ export const useUpdateGrade = () => {
     }) => gradesApi.update(id, payload),
     onSuccess: (g) => {
       qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.grades });
+      qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.levels });
       toast.success(`Grado "${g.name}" actualizado`);
     },
     onError: (e: any) =>
@@ -127,6 +129,7 @@ export const useDeleteGrade = () => {
     mutationFn: gradesApi.remove,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.grades });
+      qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.levels });
       toast.success("Grado eliminado");
     },
     onError: (e: any) =>

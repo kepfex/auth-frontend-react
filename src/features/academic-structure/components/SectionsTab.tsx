@@ -9,6 +9,7 @@ import {
   PlusIcon,
   SparklesIcon,
   Tag,
+  Trash2Icon,
   TrashIcon,
   TypeIcon,
 } from "lucide-react";
@@ -31,6 +32,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
@@ -374,8 +376,11 @@ export const SectionsTab = () => {
         open={!!deleting}
         onOpenChange={(v) => !v && setDeleting(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent size="sm">
           <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+              <Trash2Icon />
+            </AlertDialogMedia>
             <AlertDialogTitle>
               ¿Eliminar sección "{deleting?.name}"?
             </AlertDialogTitle>
@@ -386,7 +391,7 @@ export const SectionsTab = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-white"
+              variant="destructive"
               disabled={isRemoving}
               onClick={() =>
                 deleting &&

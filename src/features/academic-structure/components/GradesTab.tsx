@@ -155,7 +155,7 @@ export const GradesTab = () => {
   return (
     <div className="space-y-6 pt-1">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
-        <div>
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h2 className="text-base font-semibold text-slate-800 tracking-tight">
               Grados Escolares

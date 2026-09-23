@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   useCreateLevel,
   useDeleteLevel,
@@ -64,29 +64,65 @@ export const LevelsTab = () => {
     defaultValues: { code: "", name: "", order: 1 },
   });
 
-  useEffect(() => {
-    if (editing)
-      form.reset({
-        code: editing.code,
-        name: editing.name,
-        order: editing.order,
-      });
-    else form.reset({ code: "", name: "", order: (levels.length || 0) + 1 });
-  }, [editing, formOpen]);
+  const handleOpenCreate = () => {
+    setEditing(null);
+
+    const nextOrder =
+      Math.max(0, ...levels.map((level) => level.order)) + 1;
+
+    form.reset({
+      code: "",
+      name: "",
+      order: nextOrder,
+    });
+
+    setFormOpen(true);
+  };
+
+  const handleOpenEdit = (level: EducationalLevel) => {
+    setEditing(level);
+
+    form.reset({
+      code: level.code,
+      name: level.name,
+      order: level.order,
+    });
+
+    setFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setFormOpen(false);
+    setEditing(null);
+    form.reset();
+  };
+
+  const handleOpenDelete = (level: EducationalLevel) => {
+    setDeleting(level);
+  };
+
+  const handleCloseDelete = () => {
+    setDeleting(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleting) return;
+
+    remove(deleting.id, {
+      onSuccess: handleCloseDelete,
+    });
+  };
 
   const onSubmit = (data: LevelFormData) => {
     if (editing) {
       update(
         { id: editing.id, payload: data },
         {
-          onSuccess: () => {
-            setFormOpen(false);
-            setEditing(null);
-          },
+          onSuccess: handleCloseForm,
         },
       );
     } else {
-      create(data, { onSuccess: () => setFormOpen(false) });
+      create(data, { onSuccess: handleCloseForm });
     }
   };
 
@@ -109,10 +145,7 @@ export const LevelsTab = () => {
         </div>
         {/* <Button
           size="sm"
-          onClick={() => {
-            setEditing(null);
-            setFormOpen(true);
-          }}
+          onClick={handleOpenCreate}
           className="gap-2 bg-phoenix-gold hover:bg-phoenix-orange text-obsidian"
         >
           <Plus className="h-4 w-4" /> Nuevo nivel
@@ -151,23 +184,19 @@ export const LevelsTab = () => {
 
                     <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => {
-                          setEditing(level);
-                          setFormOpen(true);
-                        }}
+                        onClick={() => handleOpenEdit(level)}
                         className="p-1.5 rounded-lg text-slate-500 hover:text-primary hover:bg-primary/10 transition-colors"
                         title="Editar nivel"
                       >
                         <PencilIcon className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => setDeleting(level)}
+                        onClick={() => handleOpenDelete(level)}
                         disabled={gradesCount > 0}
-                        className={`p-1.5 rounded-lg transition-colors ${
-                          gradesCount > 0
-                            ? "text-slate-300 cursor-not-allowed"
-                            : "text-slate-500 hover:text-red-600 hover:bg-red-50"
-                        }`}
+                        className={`p-1.5 rounded-lg transition-colors ${gradesCount > 0
+                          ? "text-slate-300 cursor-not-allowed"
+                          : "text-slate-500 hover:text-red-600 hover:bg-red-50"
+                          }`}
                         title={
                           gradesCount > 0
                             ? "No puedes eliminar un nivel con grados asociados"
@@ -213,10 +242,7 @@ export const LevelsTab = () => {
           {/* Tarjeta de acción rápida (Dashed) */}
           <button
             type="button"
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
+            onClick={handleOpenCreate}
             className="group flex flex-col items-center justify-center gap-2.5 min-h-40 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-5 text-slate-500 transition-all duration-200 hover:border-amber-400/80 hover:bg-amber-50/20 hover:text-slate-900"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-sm group-hover:bg-amber-400 group-hover:border-amber-400 group-hover:text-slate-900 transition-all">
@@ -330,10 +356,7 @@ export const LevelsTab = () => {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => {
-                setFormOpen(false);
-                setEditing(null);
-              }}
+              onClick={handleCloseForm}
             >
               Cancelar
             </Button>
@@ -356,7 +379,9 @@ export const LevelsTab = () => {
       {/* Delete Dialog */}
       <AlertDialog
         open={!!deleting}
-        onOpenChange={(v) => !v && setDeleting(null)}
+        onOpenChange={open => {
+          if (!open) handleCloseDelete();
+        }}
       >
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
@@ -376,10 +401,7 @@ export const LevelsTab = () => {
             </AlertDialogCancel>
             <AlertDialogAction
               variant={"destructive"}
-              onClick={() =>
-                deleting &&
-                remove(deleting.id, { onSuccess: () => setDeleting(null) })
-              }
+              onClick={handleConfirmDelete}
               disabled={isRemoving}
             >
               {isRemoving ? "Eliminando..." : "Eliminar"}
