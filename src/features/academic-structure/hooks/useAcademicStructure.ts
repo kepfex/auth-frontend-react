@@ -14,6 +14,7 @@ import type {
 } from "../types/academic-structure.types";
 import type { ErrorResponse } from "@/shared/types/shared.types";
 import type { AxiosError } from "axios";
+import { getApiError } from "@/shared/utils/api-error";
 
 export const STRUCTURE_KEYS = {
   levels: ["educational-levels"] as const,
@@ -132,8 +133,16 @@ export const useDeleteGrade = () => {
       qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.levels });
       toast.success("Grado eliminado");
     },
-    onError: (e: any) =>
-      toast.error(e?.response?.data?.message ?? "No se puede eliminar"),
+    onError: (error: AxiosError<ErrorResponse>) => {    
+      const apiError = getApiError(
+        error,
+        "No se puedo eliminar el grado"
+      );
+
+      toast.error(apiError.message, {
+        description: apiError.details
+      })
+    }
   });
 };
 
@@ -185,7 +194,15 @@ export const useDeleteSection = () => {
       qc.invalidateQueries({ queryKey: STRUCTURE_KEYS.sections });
       toast.success("Sección eliminada");
     },
-    onError: (e: any) =>
-      toast.error(e?.response?.data?.message ?? "No se puede eliminar"),
+    onError: (error: AxiosError<ErrorResponse>) =>{
+      const apiError = getApiError(
+        error,
+        "No se puedo eliminar la sección"
+      );
+
+      toast.error(apiError.message, {
+        description: apiError.details
+      })
+    }
   });
 };

@@ -1,5 +1,5 @@
 import { apiClient } from "@/api/client";
-import type { CreateGradeRequest, CreateLevelRequest, CreateSectionRequest, EducationalLevel, Grade, Section, UpdateGradeRequest, UpdateLevelRequest } from "../types/academic-structure.types";
+import type { CreateGradeRequest, CreateLevelRequest, CreateSectionRequest, EducationalLevel, Grade, Section, UpdateGradeRequest, UpdateLevelRequest, UpdateSectionRequest } from "../types/academic-structure.types";
 
 // ── Niveles ───────────────────────────────────────────
 export const levelsApi = {
@@ -49,8 +49,11 @@ export const sectionsApi = {
         const { data } = await apiClient.post<{ data: Section }>('/sections', payload)
         return data.data
     },
-    update: async (id: number, payload: UpdateGradeRequest): Promise<Section> => {
-        const { data } = await apiClient.put<{ data: Section }>(`/sections/${id}`, payload)
+    update: async (id: number, payload: UpdateSectionRequest): Promise<Section> => {
+        const { data } = await apiClient.put<{ data: Section }>(
+            `/sections/${id}`,
+            payload
+        )
         return data.data
     },
     remove: async (id: number): Promise<void> => {
