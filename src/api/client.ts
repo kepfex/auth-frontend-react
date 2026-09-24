@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/features/auth/store/auth.store";
+import { useAppContextStore } from "@/store/app-context.store";
 import axios from "axios";
 
 export const apiClient = axios.create({
@@ -31,6 +32,7 @@ apiClient.interceptors.response.use(
     // Si viene del login/registro, deja que TanStack Query maneje el error
     if (error.response?.status === 401 && !isAuthRoute) {
       useAuthStore.getState().clearAuth()
+      useAppContextStore.getState().clearContext();
       window.location.href = '/login'
     }
     // Propaga el error para que los hooks lo capturen

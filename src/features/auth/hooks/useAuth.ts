@@ -3,28 +3,47 @@ import { useNavigate } from "react-router-dom";
 import { loginApi, registerApi } from "../api/auth.api";
 import { useAuthStore } from "../store/auth.store";
 import type { LoginRequest, RegisterRequest } from "../types/auth.types";
+import { useAppContextStore } from "@/store/app-context.store";
 
 // Este hook conecta la API con el store. Los componentes solo usan este hook.
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const setAuth = useAuthStore((state) => state.setAuth);
+
+  const setAcademicYear = useAppContextStore(state => state.setAcademicYear)
+
   const navigate = useNavigate();
 
   const login = async (data: LoginRequest) => {
     setIsLoading(true);
     setError(null);
+
     try {
       const response = await loginApi(data);
-      setAuth(response.user, response.token, response.academic_year); // guarda en Zustand + localStorage
+
+      setAuth(response.user, response.token); // guarda en Zustand + localStorage
+
+      setAcademicYear(response.academic_year)
+
       navigate("/admin");
     } catch (err: unknown) {
       const data = (
-        err as { response?: { data?: { message?: string; error?: string } } }
+        err as {
+          response?: {
+            data?: {
+              message?: string;
+              error?: string
+            };
+          };
+        }
       )?.response?.data;
 
       // ✅ busca "message" primero, luego "error", luego el fallback
-      const message = data?.message ?? data?.error ?? "Error al iniciar sesión";
+      const message =
+        data?.message ??
+        data?.error ??
+        "Error al iniciar sesión";
       setError(message);
     } finally {
       setIsLoading(false);
@@ -38,6 +57,8 @@ export const useRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const setAuth = useAuthStore((state) => state.setAuth);
+  const setAcademicYear = useAppContextStore(state => state.setAcademicYear)
+
   const navigate = useNavigate();
 
   const register = async (data: RegisterRequest) => {
@@ -45,7 +66,8 @@ export const useRegister = () => {
     setError(null);
     try {
       const response = await registerApi(data);
-      setAuth(response.user, response.token, response.academic_year); // guarda en Zustand + localStorage
+      setAuth(response.user, response.token); // guarda en Zustand + localStorage
+      setAcademicYear( response.academic_year );
       navigate("/admin");
     } catch (err: unknown) {
       const message =
@@ -62,10 +84,12 @@ export const useRegister = () => {
 
 export const useLogout = () => {
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const clearContext = useAppContextStore(state => state.clearContext)
   const navigate = useNavigate();
 
   const logout = () => {
     clearAuth();
+    clearContext();
     navigate("/login");
   };
 

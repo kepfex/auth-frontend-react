@@ -9,15 +9,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthStore } from "@/features/auth/store/auth.store";
 import { useAcademicYearsAll } from "../hooks/useAcademicYears";
 import { cn } from "@/lib/utils";
 import type { AcademicYear } from "../types/academic-year.types";
+import { useAppContextStore } from "@/store/app-context.store";
 
 export const AcademicYearSelector = () => {
   // Año actualmente seleccionado en la sesión
-  const academicYear = useAuthStore((state) => state.academicYear);
-  const setAcademicYear = useAuthStore((state) => state.setAcademicYear);
+  const academicYear = useAppContextStore((state) => state.academicYear);
+  const setAcademicYear = useAppContextStore((state) => state.setAcademicYear);
 
   // Lista de todos los años desde la API (cacheada 30 min)
   const { data: years, isLoading } = useAcademicYearsAll();

@@ -1,6 +1,7 @@
 import { ChevronDown, GraduationCap, Menu, Sun } from "lucide-react";
 import UserDropdown from "./UserDropdown";
 import { AcademicYearSelector } from "@/features/academic-years/components/AcademicYearSelector";
+import { EducationalLevelSelector } from "@/features/academic-structure/components/EducationalLevelSelector";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -48,6 +49,7 @@ export default function Navbar({
       <div className="flex items-center space-x-3 sm:space-x-4">
         {/* ✅ Selector de año académico — visible siempre */}
         <AcademicYearSelector />
+        <EducationalLevelSelector />
 
         {/* Theme Dropdown Toggle */}
         <div className="relative">

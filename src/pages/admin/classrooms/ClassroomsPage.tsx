@@ -1,10 +1,11 @@
-import { useAuthStore } from "@/features/auth/store/auth.store";
 import { useClassrooms } from "@/features/classrooms/hooks/useClassrooms";
+import { useAppContextStore } from "@/store/app-context.store";
 
 export const ClassroomsPage = () => {
-  const academicYear = useAuthStore(
+  const academicYear = useAppContextStore(
     (state) => state.academicYear
   );
+  const educationalLevel = useAppContextStore((state) => state.educationalLevel);
 
   const {
     data: classrooms,
@@ -41,6 +42,9 @@ export const ClassroomsPage = () => {
 
         <p className="text-sm text-muted-foreground">
           Año académico {academicYear.name}
+          {" · "}
+          {educationalLevel?.name ??
+            "Todos los niveles"}
         </p>
       </div>
 
