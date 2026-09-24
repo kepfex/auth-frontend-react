@@ -1,20 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { classroomsApi } from "../api/classrooms.api";
 import { useAppContextStore } from "@/store/app-context.store";
+import type { CreateClassroomRequest, UpdateClassroomRequest } from "../types/classroom.types";
 
-export const CLASSROOMS_KEY = {
+export const CLASSROOMS_KEYS = {
   all: ["classrooms"] as const,
+
+  lists: () => [...CLASSROOMS_KEYS.all, "list"] as const,
 
   list: (
     academicYearId: number,
     educationalLevelId?: number
   ) =>
     [
-      "classrooms",
-      "list",
+      ...CLASSROOMS_KEYS.lists(),
       academicYearId,
       educationalLevelId ?? "all",
     ] as const,
+
+  detail: (id: number) => [...CLASSROOMS_KEYS.all, "detail", id] as const
 };
 
 export const useClassrooms = () => {
@@ -28,7 +32,7 @@ export const useClassrooms = () => {
     );
 
     return useQuery({
-        queryKey: CLASSROOMS_KEY.list(
+        queryKey: CLASSROOMS_KEYS.list(
             academicYear?.id ?? 0,
             educationalLevel?.id
         ),
@@ -46,3 +50,51 @@ export const useClassrooms = () => {
     })
 };
 
+export const useCreateClassroom = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateClassroomRequest) => classroomsApi.create(payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: CLASSROOMS_KEYS.lists()
+      })
+    }
+  })
+}
+
+export const useUpdateClassroom = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: UpdateClassroomRequest;
+    }) =>
+      classroomsApi.update(id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: CLASSROOMS_KEYS.all,
+      });
+    },
+  });
+};
+
+export const useDeleteClassroom = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: classroomsApi.remove,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: CLASSROOMS_KEYS.lists(),
+      });
+    },
+  });
+};

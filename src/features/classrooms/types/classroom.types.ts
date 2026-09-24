@@ -1,45 +1,24 @@
-import type { Grade, Section } from "@/features/academic-structure/types/academic-structure.types";
+import type {
+  Grade,
+  Section,
+} from "@/features/academic-structure/types/academic-structure.types";
 import type { AcademicYear } from "@/features/academic-years/types/academic-year.types";
 
-export type ClassroomsShift =
-    | "mañana"
-    | "tarde"
-    | "mañana y tarde";
+export type ClassroomShift = "mañana" | "tarde" | "mañana y tarde";
 
 export interface Classroom {
-    id: number;
+  id: number;
 
-    shift: ClassroomsShift;
-    capacity: number;
-    is_active: boolean;
+  shift: ClassroomShift;
+  capacity: number;
+  is_active: boolean;
 
-    academic_year: AcademicYear;
-    grade: Grade;
-    section: Section;
+  academic_year: AcademicYear;
+  grade: Grade;
+  section: Section;
 
-    created_at: string;
-    updated_at: string;
-}
-
-export interface ClassroomPaginatedResponse {
-    data: Classroom[];
-
-    links: {
-        first: string;
-        last: string;
-        prev: string | null;
-        next: string | null;
-    };
-
-    meta: {
-        current_page: number;
-        from: number | null;
-        last_page: number;
-        path: string;
-        per_page: number;
-        to: number | null;
-        total: number;
-    };
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ClassroomFilters {
@@ -48,4 +27,36 @@ export interface ClassroomFilters {
   is_active?: boolean;
   per_page?: number;
   page?: number;
+}
+
+export interface CreateClassroomRequest {
+  academic_year_id: number;
+  grade_id: number;
+  section_id: number;
+  shift: ClassroomShift;
+  capacity: number;
+  is_active: boolean;
+}
+
+export type UpdateClassroomRequest = Partial<CreateClassroomRequest>;
+
+export interface ClassroomPaginatedResponse {
+  data: Classroom[];
+
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+
+  meta: {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    path: string;
+    per_page: number;
+    to: number | null;
+    total: number;
+  };
 }
