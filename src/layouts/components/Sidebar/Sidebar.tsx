@@ -53,7 +53,7 @@ const MENU_GROUPS: MenuGroup[] = [
           {
             id: 'academico-aulas',
             label: 'Aulas y Secciones',
-            // path: '/admin/classrooms',
+            path: '/admin/classrooms',
           },
         ]
       }

@@ -8,6 +8,7 @@ import HomePage from '@/pages/HomePage'
 import AdminLayout from '@/layouts/AdminLayout'
 import { AcademicYearsPage } from '@/pages/admin/academic-years/AcademicYearsPage'
 import { AcademicStructurePage } from '@/pages/admin/academic-structure/AcademicStructurePage'
+import { ClassroomsPage } from '@/pages/admin/classrooms/ClassroomsPage'
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -23,6 +24,7 @@ export const AppRouter = () => (
           <Route index element={<DashboardPage />} />
           <Route path="academic-years" element={<AcademicYearsPage />} />
           <Route path='academic-structure' element={<AcademicStructurePage />} />
+          <Route path='classrooms' element={<ClassroomsPage/>}/>
         </Route>
       </Route>
 
