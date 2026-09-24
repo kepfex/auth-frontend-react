@@ -13,6 +13,7 @@ export interface Grade {
     code: string
     name: string
     order: number
+    grade_sections_count: number
     educational_level?: EducationalLevel
 }
 
@@ -27,7 +28,7 @@ export interface CreateLevelRequest {
     name: string
     order: number
 }
-export interface UpdateLevelRequest extends Partial<CreateLevelRequest> {}
+export type UpdateLevelRequest = Partial<CreateLevelRequest>
 
 export interface CreateGradeRequest {
     educational_level_id: number
@@ -35,7 +36,7 @@ export interface CreateGradeRequest {
     name: string
     order: number
 }
-export interface UpdateGradeRequest extends Partial<CreateGradeRequest> {}
+export type UpdateGradeRequest = Partial<CreateGradeRequest>
 
 export interface CreateSectionRequest { name: string }
 export interface UpdateSectionRequest { name: string }

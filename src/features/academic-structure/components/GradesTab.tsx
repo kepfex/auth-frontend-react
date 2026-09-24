@@ -312,6 +312,7 @@ export const GradesTab = () => {
                   ) : (
                     <div className="divide-y divide-slate-100 dark:divide-slate-800">
                       {lvlGrades.map((grade) => {
+                        const isInUse = grade.grade_sections_count > 0;
                         const formattedOrder = String(grade.order).padStart(
                           2,
                           "0",
@@ -355,9 +356,14 @@ export const GradesTab = () => {
                               </button>
                               <button
                                 type="button"
+                                disabled={isInUse}
                                 className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-800 transition-colors"
                                 onClick={() => setDeleting(grade)}
-                                title="Eliminar grado"
+                                title={
+                                  isInUse 
+                                  ? "No se puede eliminar porque está asociado a una sección"
+                                  : "Eliminar grado"
+                                }
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
