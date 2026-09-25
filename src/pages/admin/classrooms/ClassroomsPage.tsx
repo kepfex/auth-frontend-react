@@ -1,6 +1,7 @@
 import { useGrades, useLevels } from "@/features/academic-structure/hooks/useAcademicStructure";
 import type { Grade } from "@/features/academic-structure/types/academic-structure.types";
 import { ClassroomByLevel } from "@/features/classrooms/components/ClassroomByLevel";
+import { ClassroomFormSheet } from "@/features/classrooms/components/ClassroomFormSheet";
 import { useClassrooms } from "@/features/classrooms/hooks/useClassrooms";
 import type { Classroom } from "@/features/classrooms/types/classroom.types";
 import { groupClassroomsByGrade } from "@/features/classrooms/utils/classroom.utils";
@@ -60,14 +61,14 @@ export const ClassroomsPage = () => {
     setSheetOpen(true);
   };
 
-  // const handleSheetChange = (open: boolean) => {
-  //   setSheetOpen(open);
+  const handleSheetChange = (open: boolean) => {
+    setSheetOpen(open);
 
-  //   if (!open) {
-  //     setSelectedGrade(null);
-  //     setEditingClassroom(null);
-  //   }
-  // };
+    if (!open) {
+      setSelectedGrade(null);
+      setEditingClassroom(null);
+    }
+  };
 
   const isLoading = isLoadingLevels || isLoadingGrades || isLoadingClassrooms;
 
@@ -122,12 +123,12 @@ export const ClassroomsPage = () => {
         onEdit={handleEdit}
       />
 
-      {/* <ClassroomFormSheet
+      <ClassroomFormSheet
         open={sheetOpen}
         onOpenChange={handleSheetChange}
         grade={selectedGrade}
         classroom={editingClassroom}
-      /> */}
+      />
     </div>
   );
 };
