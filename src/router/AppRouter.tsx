@@ -1,14 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { AuthGuard } from './guards/AuthGuard'
-import { LoginPage } from '../pages/auth/LoginPage'
-import { RegisterPage } from '../pages/auth/RegisterPage'
-import { DashboardPage } from '../pages/admin/DashboardPage'
-import HomePage from '@/pages/HomePage'
-import AdminLayout from '@/layouts/AdminLayout'
-import { AcademicYearsPage } from '@/pages/admin/academic-years/AcademicYearsPage'
-import { AcademicStructurePage } from '@/pages/admin/academic-structure/AcademicStructurePage'
-import { ClassroomsPage } from '@/pages/admin/classrooms/ClassroomsPage'
+import { AuthGuard } from "./guards/AuthGuard";
+import { LoginPage } from "../pages/auth/LoginPage";
+import { RegisterPage } from "../pages/auth/RegisterPage";
+import { DashboardPage } from "../pages/admin/DashboardPage";
+import HomePage from "@/pages/HomePage";
+import AdminLayout from "@/layouts/AdminLayout";
+import { AcademicYearsPage } from "@/pages/admin/academic-years/AcademicYearsPage";
+import { AcademicStructurePage } from "@/pages/admin/academic-structure/AcademicStructurePage";
+import { ClassroomsPage } from "@/pages/admin/classrooms/ClassroomsPage";
+import { StudentsPage } from "@/pages/admin/students/StudentsPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -23,8 +24,13 @@ export const AppRouter = () => (
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="academic-years" element={<AcademicYearsPage />} />
-          <Route path='academic-structure' element={<AcademicStructurePage />} />
-          <Route path='classrooms' element={<ClassroomsPage/>}/>
+          <Route
+            path="academic-structure"
+            element={<AcademicStructurePage />}
+          />
+          <Route path="classrooms" element={<ClassroomsPage />} />
+          
+          <Route path="/admin/students" element={<StudentsPage />} />
         </Route>
       </Route>
 
@@ -32,4 +38,4 @@ export const AppRouter = () => (
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>
-)
+);
