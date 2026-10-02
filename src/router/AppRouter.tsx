@@ -10,6 +10,7 @@ import { AcademicYearsPage } from "@/pages/admin/academic-years/AcademicYearsPag
 import { AcademicStructurePage } from "@/pages/admin/academic-structure/AcademicStructurePage";
 import { ClassroomsPage } from "@/pages/admin/classrooms/ClassroomsPage";
 import { StudentsPage } from "@/pages/admin/students/StudentsPage";
+import { StudentCreatePage } from "@/pages/admin/students/StudentCreatePage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -29,8 +30,9 @@ export const AppRouter = () => (
             element={<AcademicStructurePage />}
           />
           <Route path="classrooms" element={<ClassroomsPage />} />
-          
+
           <Route path="/admin/students" element={<StudentsPage />} />
+          <Route path="/admin/students/new" element={<StudentCreatePage />} />
         </Route>
       </Route>
 
