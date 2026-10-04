@@ -77,7 +77,7 @@ export const StudentFilters = ({
           )
         }
       >
-        <SelectTrigger className="w-full md:w-[180px]">
+        <SelectTrigger className="w-full md:w-45">
           <SelectValue placeholder="Estado" />
         </SelectTrigger>
 

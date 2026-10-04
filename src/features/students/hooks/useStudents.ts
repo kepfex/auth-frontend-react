@@ -37,18 +37,20 @@ export const useStudents = (
 };
 
 export const useStudent = (
-  id: number,
-  enabled = true,
+  id?: number,
 ) => {
   return useQuery({
-    queryKey: STUDENT_KEYS.detail(id),
+    queryKey: STUDENT_KEYS.detail(id ?? 0),
 
     queryFn: () =>
-      studentsApi.getById(id),
+      studentsApi.getById(id!),
 
-    enabled: enabled && id > 0,
+    enabled:
+      typeof id === "number" &&
+      Number.isInteger(id) &&
+      id > 0,
 
-    staleTime: 1000 * 60 * 5,
+    // staleTime: 1000 * 60 * 5,
   });
 };
 

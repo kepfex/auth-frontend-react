@@ -82,7 +82,7 @@ export const StudentTable = ({
               Estado
             </TableHead>
 
-            <TableHead className="w-[70px] text-right">
+            <TableHead className="w-17.5 text-right">
               Acciones
             </TableHead>
           </TableRow>

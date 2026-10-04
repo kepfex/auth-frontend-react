@@ -16,8 +16,8 @@ import type { StudentCreateFormValues, } from "../../schemas/student-create.sche
 import type { DocumentType, Person, } from "../../types/person.types";
 import type { CreateStudentRequest, Student, } from "../../types/student.types";
 import { getApiErrorMessage, } from "@/utils/api-error";
-import { PersonDocumentSearch, } from "./PersonDocumentSearch";
-import { PersonFormFields, } from "./PersonFormFields";
+import { PersonDocumentSearch, } from "../person/PersonDocumentSearch";
+import { PersonFormFields, } from "../person/PersonFormFields";
 import { useFindPersonByDocument } from "../../hooks/usePersonSearch";
 
 interface StudentDataStepProps {

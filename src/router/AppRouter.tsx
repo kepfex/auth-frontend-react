@@ -11,6 +11,7 @@ import { AcademicStructurePage } from "@/pages/admin/academic-structure/Academic
 import { ClassroomsPage } from "@/pages/admin/classrooms/ClassroomsPage";
 import { StudentsPage } from "@/pages/admin/students/StudentsPage";
 import { StudentCreatePage } from "@/pages/admin/students/StudentCreatePage";
+import { StudentGuardianSetupPage } from "@/pages/admin/students/StudentGuardianSetupPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -31,8 +32,22 @@ export const AppRouter = () => (
           />
           <Route path="classrooms" element={<ClassroomsPage />} />
 
-          <Route path="/admin/students" element={<StudentsPage />} />
-          <Route path="/admin/students/new" element={<StudentCreatePage />} />
+          <Route
+            path="students"
+            element={<StudentsPage />}
+          />
+
+          <Route
+            path="students/new"
+            element={<StudentCreatePage />}
+          />
+
+          <Route
+            path="students/:studentId/setup/guardians"
+            element={
+              <StudentGuardianSetupPage />
+            }
+          />
         </Route>
       </Route>
 

@@ -167,7 +167,7 @@ export const StudentsPage = () => {
           {isLoading ? (
             <StudentTableSkeleton />
           ) : isError ? (
-            <div className="flex min-h-[280px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+            <div className="flex min-h-70 flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
               <AlertCircle className="mb-3 size-8 text-muted-foreground" />
 
               <h3 className="font-semibold">
