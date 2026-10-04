@@ -19,6 +19,15 @@ export const PERSON_KEYS = {
     ] as const,
 };
 
+export const useFindPersonByDocument = () => {
+  return useMutation({
+    mutationFn: (
+      params: PersonSearchParams,
+    ) =>
+      personsApi.findByDocument(params),
+  });
+};
+
 export const usePersonSearch = (params: PersonSearchParams, enabled = true) => {
   const documentNumber = params.document_number.trim();
 

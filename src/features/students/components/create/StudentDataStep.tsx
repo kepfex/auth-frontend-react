@@ -1,102 +1,24 @@
-import {
-  useState,
-} from "react";
-
-import {
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  UserRound,
-} from "lucide-react";
-
-import {
-  useForm,
-} from "react-hook-form";
-
-import {
-  zodResolver,
-} from "@hookform/resolvers/zod";
-
-import {
-  toast,
-} from "sonner";
-
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
-
-import {
-  Button,
-} from "@/components/ui/button";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-import {
-  Input,
-} from "@/components/ui/input";
-
-import {
-  Label,
-} from "@/components/ui/label";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import {
-  Separator,
-} from "@/components/ui/separator";
-
-import {
-  personsApi,
-} from "../../api/persons.api";
-
-import {
-  useCreateStudent,
-} from "../../hooks/useStudents";
-
-import {
-  STUDENT_CREATE_DEFAULT_VALUES,
-  studentCreateSchema,
-} from "../../schemas/student-create.schema";
-
-import type {
-  StudentCreateFormValues,
-} from "../../schemas/student-create.schema";
-
-import type {
-  DocumentType,
-  Person,
-} from "../../types/person.types";
-
-import type {
-  CreateStudentRequest,
-  Student,
-} from "../../types/student.types";
-
-import {
-  getApiErrorMessage,
-} from "@/utils/api-error";
-
-import {
-  PersonDocumentSearch,
-} from "./PersonDocumentSearch";
-
-import {
-  PersonFormFields,
-} from "./PersonFormFields";
+import { useState, } from "react";
+import { AlertCircle, CheckCircle2, Loader2, UserRound, } from "lucide-react";
+import { useForm, useWatch, } from "react-hook-form";
+import { zodResolver, } from "@hookform/resolvers/zod";
+import { toast, } from "sonner";
+import { Alert, AlertDescription, AlertTitle, } from "@/components/ui/alert";
+import { Button, } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Input, } from "@/components/ui/input";
+import { Label, } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { Separator, } from "@/components/ui/separator";
+import { useCreateStudent, } from "../../hooks/useStudents";
+import { STUDENT_CREATE_DEFAULT_VALUES, studentCreateSchema, } from "../../schemas/student-create.schema";
+import type { StudentCreateFormValues, } from "../../schemas/student-create.schema";
+import type { DocumentType, Person, } from "../../types/person.types";
+import type { CreateStudentRequest, Student, } from "../../types/student.types";
+import { getApiErrorMessage, } from "@/utils/api-error";
+import { PersonDocumentSearch, } from "./PersonDocumentSearch";
+import { PersonFormFields, } from "./PersonFormFields";
+import { useFindPersonByDocument } from "../../hooks/usePersonSearch";
 
 interface StudentDataStepProps {
   onStudentCreated: (
@@ -127,10 +49,7 @@ export const StudentDataStep = ({
   ] =
     useState<Person | null>(null);
 
-  const [
-    isSearching,
-    setIsSearching,
-  ] = useState(false);
+  const findPerson = useFindPersonByDocument();
 
   const createStudent =
     useCreateStudent();
@@ -145,15 +64,20 @@ export const StudentDataStep = ({
         STUDENT_CREATE_DEFAULT_VALUES,
     });
 
-  const documentType =
-    form.watch(
-      "person.document_type",
-    );
+  const documentType = useWatch({
+    control: form.control,
+    name: "person.document_type",
+  });
 
-  const documentNumber =
-    form.watch(
-      "person.document_number",
-    );
+  const documentNumber = useWatch({
+    control: form.control,
+    name: "person.document_number",
+  });
+
+  const studentStatus = useWatch({
+    control: form.control,
+    name: "student.status",
+  });
 
   const resetPersonDetails = () => {
     form.setValue(
@@ -284,12 +208,11 @@ export const StudentDataStep = ({
     }
 
     try {
-      setIsSearching(true);
-
       const person =
-        await personsApi.findByDocument({
+        await findPerson.mutateAsync({
           document_type:
             documentType,
+
           document_number:
             documentNumber.trim(),
         });
@@ -306,7 +229,7 @@ export const StudentDataStep = ({
       fillPerson(person);
       setExistingPerson(person);
 
-      if (person.student_id) {
+      if (person.student_id !== null) {
         setSearchState(
           "already-student",
         );
@@ -324,8 +247,6 @@ export const StudentDataStep = ({
           "No se pudo buscar la persona",
         ),
       );
-    } finally {
-      setIsSearching(false);
     }
   };
 
@@ -354,7 +275,7 @@ export const StudentDataStep = ({
 
         if (
           searchState ===
-            "existing" &&
+          "existing" &&
           existingPerson
         ) {
           payload = {
@@ -484,7 +405,7 @@ export const StudentDataStep = ({
                 documentNumber
               }
               isSearching={
-                isSearching
+                findPerson.isPending
               }
               disabled={
                 createStudent.isPending
@@ -504,76 +425,76 @@ export const StudentDataStep = ({
               .person
               ?.document_number
               ?.message && (
-              <p className="text-sm text-destructive">
-                {
-                  form.formState
-                    .errors.person
-                    .document_number
-                    .message
-                }
-              </p>
-            )}
+                <p className="text-sm text-destructive">
+                  {
+                    form.formState
+                      .errors.person
+                      .document_number
+                      .message
+                  }
+                </p>
+              )}
           </div>
 
           {searchState ===
             "idle" && (
-            <Alert>
-              <UserRound className="size-4" />
+              <Alert>
+                <UserRound className="size-4" />
 
-              <AlertTitle>
-                Busca al estudiante
-              </AlertTitle>
+                <AlertTitle>
+                  Busca al estudiante
+                </AlertTitle>
 
-              <AlertDescription>
-                La búsqueda evita crear personas duplicadas dentro del sistema.
-              </AlertDescription>
-            </Alert>
-          )}
+                <AlertDescription>
+                  La búsqueda evita crear personas duplicadas dentro del sistema.
+                </AlertDescription>
+              </Alert>
+            )}
 
           {searchState ===
             "new" && (
-            <Alert>
-              <CheckCircle2 className="size-4" />
+              <Alert>
+                <CheckCircle2 className="size-4" />
 
-              <AlertTitle>
-                Persona no registrada
-              </AlertTitle>
+                <AlertTitle>
+                  Persona no registrada
+                </AlertTitle>
 
-              <AlertDescription>
-                Completa sus datos personales para crearla junto con el estudiante.
-              </AlertDescription>
-            </Alert>
-          )}
+                <AlertDescription>
+                  Completa sus datos personales para crearla junto con el estudiante.
+                </AlertDescription>
+              </Alert>
+            )}
 
           {searchState ===
             "existing" && (
-            <Alert>
-              <CheckCircle2 className="size-4" />
+              <Alert>
+                <CheckCircle2 className="size-4" />
 
-              <AlertTitle>
-                Persona encontrada
-              </AlertTitle>
+                <AlertTitle>
+                  Persona encontrada
+                </AlertTitle>
 
-              <AlertDescription>
-                Utilizaremos la persona existente y la registraremos como estudiante.
-              </AlertDescription>
-            </Alert>
-          )}
+                <AlertDescription>
+                  Utilizaremos la persona existente y la registraremos como estudiante.
+                </AlertDescription>
+              </Alert>
+            )}
 
           {searchState ===
             "already-student" && (
-            <Alert variant="destructive">
-              <AlertCircle className="size-4" />
+              <Alert variant="destructive">
+                <AlertCircle className="size-4" />
 
-              <AlertTitle>
-                Estudiante ya registrado
-              </AlertTitle>
+                <AlertTitle>
+                  Estudiante ya registrado
+                </AlertTitle>
 
-              <AlertDescription>
-                Esta persona ya se encuentra registrada como estudiante.
-              </AlertDescription>
-            </Alert>
-          )}
+                <AlertDescription>
+                  Esta persona ya se encuentra registrada como estudiante.
+                </AlertDescription>
+              </Alert>
+            )}
 
           {canShowForm && (
             <>
@@ -629,17 +550,17 @@ export const StudentDataStep = ({
                       .errors.student
                       ?.student_code
                       ?.message && (
-                      <p className="text-sm text-destructive">
-                        {
-                          form
-                            .formState
-                            .errors
-                            .student
-                            .student_code
-                            .message
-                        }
-                      </p>
-                    )}
+                        <p className="text-sm text-destructive">
+                          {
+                            form
+                              .formState
+                              .errors
+                              .student
+                              .student_code
+                              .message
+                          }
+                        </p>
+                      )}
                   </div>
 
                   <div className="space-y-2">
@@ -648,18 +569,16 @@ export const StudentDataStep = ({
                     </Label>
 
                     <Select
-                      value={form.watch(
-                        "student.status",
-                      )}
+                      value={studentStatus}
                       onValueChange={(
                         value,
                       ) =>
                         form.setValue(
                           "student.status",
                           value as
-                            | "activo"
-                            | "inactivo"
-                            | "egresado",
+                          | "activo"
+                          | "inactivo"
+                          | "egresado",
                           {
                             shouldValidate:
                               true,

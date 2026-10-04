@@ -1,5 +1,6 @@
-import type {
-  UseFormReturn,
+import {
+  useWatch,
+  type UseFormReturn,
 } from "react-hook-form";
 
 import {
@@ -34,11 +35,14 @@ export const PersonFormFields = ({
   const {
     register,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = form;
 
-  const sex = watch("person.sex");
+  const sex = useWatch({
+    control,
+    name: "person.sex",
+  });
 
   return (
     <div className="grid gap-5 md:grid-cols-2">
