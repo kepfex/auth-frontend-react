@@ -1,29 +1,15 @@
 import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import {AlertDialog,AlertDialogAction,AlertDialogCancel,AlertDialogContent,AlertDialogDescription,AlertDialogFooter,AlertDialogHeader,AlertDialogTitle,} from "@/components/ui/alert-dialog";
 import { getApiError } from "@/shared/utils/api-error";
-
 import { GuardianForm } from "./GuardianForm";
 import { GuardianList } from "./GuardianList";
 import { GuardianRelationEditForm } from "./GuardianRelationEditForm";
-import {
-  useDetachGuardianFromStudent,
-  useStudentGuardians,
-} from "../../hooks/useGuardians";
+import {useDetachGuardianFromStudent,useStudentGuardians,} from "../../hooks/useGuardians";
 import { useGuardianRelationships } from "../../hooks/useGuardianRelationships";
 import type { StudentGuardian } from "../../types/guardian.types";
 

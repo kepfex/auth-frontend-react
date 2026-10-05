@@ -12,6 +12,7 @@ import { ClassroomsPage } from "@/pages/admin/classrooms/ClassroomsPage";
 import { StudentsPage } from "@/pages/admin/students/StudentsPage";
 import { StudentCreatePage } from "@/pages/admin/students/StudentCreatePage";
 import { StudentGuardianSetupPage } from "@/pages/admin/students/StudentGuardianSetupPage";
+import { StudentDetailPage } from "@/pages/admin/students/StudentDetailPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -47,6 +48,10 @@ export const AppRouter = () => (
             element={
               <StudentGuardianSetupPage />
             }
+          />
+          <Route
+            path="students/:studentId"
+            element={<StudentDetailPage />}
           />
         </Route>
       </Route>
