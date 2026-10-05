@@ -63,4 +63,25 @@ export interface PersonFormValues {
   is_active?: boolean;
 }
 
+export interface UpdateStudentPersonRequest {
+  document_type: DocumentType;
+  document_number: string;
+
+  first_names: string;
+  paternal_surname: string;
+
+  maternal_surname?: string | null;
+
+  phone?: string | null;
+  email?: string | null;
+
+  birth_date?: string | null;
+
+  address?: string | null;
+
+  sex?: Sex | null;
+
+  is_active?: boolean;
+}
+
 export type UpdatePersonRequest  = Partial<CreatePersonRequest>;

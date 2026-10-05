@@ -80,18 +80,12 @@ export const useCreateStudent = () => {
   });
 };
 
-export const useUpdateStudent = () => {
+export const useUpdateStudent = (studentId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: UpdateStudentRequest;
-    }) =>
-      studentsApi.update(id, payload),
+    mutationFn: (payload: UpdateStudentRequest) =>
+      studentsApi.update(studentId, payload),
 
     onSuccess: (student) => {
       queryClient.setQueryData(

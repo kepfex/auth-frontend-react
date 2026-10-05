@@ -1,4 +1,4 @@
-import type { CreatePersonRequest, Person } from "./person.types";
+import type { CreatePersonRequest, Person, UpdatePersonRequest } from "./person.types";
 
 export type StudentStatus = "activo" | "inactivo" | "egresado";
 
@@ -45,6 +45,8 @@ export type CreateStudentRequest =
 export interface UpdateStudentRequest {
   student_code?: string;
   status?: StudentStatus;
+
+  person?: UpdatePersonRequest;
 }
 
 export interface StudentPaginatedResponse {
