@@ -149,3 +149,42 @@ export const useUpdateEnrollment = (enrollmentId: number) => {
     },
   });
 };
+
+// ─────────────────────────────────────────────────────
+// Cantidad actual de matriculados por aula
+// ─────────────────────────────────────────────────────
+
+export const useClassroomEnrollmentCount = (
+  academicYearId?: number,
+  gradeSectionId?: number,
+) => {
+  return useQuery({
+    queryKey: [
+      ...ENROLLMENT_KEYS.all,
+      "classroom-count",
+      academicYearId ?? 0,
+      gradeSectionId ?? 0,
+    ],
+
+    queryFn: async () => {
+      const response = await enrollmentsApi.getAll({
+        academic_year_id: academicYearId,
+
+        grade_section_id: gradeSectionId,
+
+        status: "matriculado",
+
+        /*
+         * El backend requiere mínimo 5.
+         * Solo nos interesa meta.total.
+         */
+        per_page: 5,
+        page: 1,
+      });
+
+      return response.meta.total;
+    },
+
+    enabled: Boolean(academicYearId) && Boolean(gradeSectionId),
+  });
+};

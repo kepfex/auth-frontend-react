@@ -1,5 +1,5 @@
-import type { EnrollmentFormValues } from "../enrollments/schemas/enrollment.schema";
-import type { CreateEnrollmentRequest } from "../enrollments/types/enrollment.types";
+import type { EnrollmentFormValues } from "../schemas/enrollment.schema";
+import type { CreateEnrollmentRequest } from "../types/enrollment.types";
 
 export const mapEnrollmentFormToRequest = (
   values: EnrollmentFormValues,

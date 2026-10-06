@@ -14,6 +14,7 @@ import { StudentCreatePage } from "@/pages/admin/students/StudentCreatePage";
 import { StudentGuardianSetupPage } from "@/pages/admin/students/StudentGuardianSetupPage";
 import { StudentDetailPage } from "@/pages/admin/students/StudentDetailPage";
 import { EnrollmentsPage } from "@/pages/admin/enrollments/EnrollmentsPage";
+import { NewEnrollmentPage } from "@/pages/admin/enrollments/NewEnrollmentPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -43,7 +44,9 @@ export const AppRouter = () => (
             element={<StudentGuardianSetupPage />}
           />
           <Route path="students/:studentId" element={<StudentDetailPage />} />
+          
           <Route path="enrollments" element={<EnrollmentsPage />} />
+          <Route path="enrollments/new" element={<NewEnrollmentPage />} />
         </Route>
       </Route>
 
