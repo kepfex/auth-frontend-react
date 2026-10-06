@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { AlertCircle, BookOpen, CalendarDays, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,78 @@ export function EnrollmentsPage() {
   const educationalLevel = useAppContextStore(
     (state) => state.educationalLevel,
   );
+
+  // Limpieza de filtros locales si el contexto global cambia.
+
+  // ───────────────────────────────────────────────────
+  // Identificador del contexto actual
+  // ───────────────────────────────────────────────────
+
+  const contextKey =
+    academicYear && educationalLevel
+      ? `${academicYear.id}:${educationalLevel.id}`
+      : null;
+
+  const previousContextKeyRef = useRef<string | null>(null);
+
+  const contextInitializedRef = useRef(false);
+
+  // ───────────────────────────────────────────────────
+  // Limpiar filtros dependientes al cambiar contexto
+  // ───────────────────────────────────────────────────
+
+  useEffect(() => {
+    /*
+     * Esperamos hasta tener un contexto
+     * académico completo.
+     */
+    if (!contextKey) {
+      return;
+    }
+
+    /*
+     * Primera vez que recibimos un contexto.
+     *
+     * Solo lo almacenamos.
+     * NO limpiamos la URL.
+     */
+    if (!contextInitializedRef.current) {
+      contextInitializedRef.current = true;
+
+      previousContextKeyRef.current = contextKey;
+
+      return;
+    }
+
+    /*
+     * El contexto sigue siendo exactamente
+     * el mismo.
+     */
+    if (previousContextKeyRef.current === contextKey) {
+      return;
+    }
+
+    /*
+     * Aquí sí sabemos que ocurrió
+     * un cambio real posterior.
+     */
+    previousContextKeyRef.current = contextKey;
+
+    setSearchParams(
+      (currentParams) => {
+        const next = new URLSearchParams(currentParams);
+
+        next.delete("grade");
+        next.delete("classroom");
+        next.delete("page");
+
+        return next;
+      },
+      {
+        replace: true,
+      },
+    );
+  }, [contextKey, setSearchParams]);
 
   // ───────────────────────────────────────────────────
   // Parámetros locales de la página
