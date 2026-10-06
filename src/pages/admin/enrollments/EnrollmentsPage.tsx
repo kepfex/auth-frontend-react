@@ -10,10 +10,14 @@ import { EnrollmentTable } from "@/features/enrollments/components/EnrollmentTab
 import { EnrollmentTableSkeleton } from "@/features/enrollments/components/EnrollmentTableSkeleton";
 import { useEnrollments } from "@/features/enrollments/hooks/useEnrollments";
 import { useEnrollmentStatuses } from "@/features/enrollments/hooks/useEnrollmentStatuses";
-import type { EnrollmentStatus } from "@/features/enrollments/types/enrollment.types";
+import type {
+  Enrollment,
+  EnrollmentStatus,
+} from "@/features/enrollments/types/enrollment.types";
 import { useGrades } from "@/features/academic-structure/hooks/useAcademicStructure";
 import { useClassrooms } from "@/features/classrooms/hooks/useClassrooms";
 import { useAppContextStore } from "@/store/app-context.store";
+import { EnrollmentEditSheet } from "@/features/enrollments/components/EnrollmentEditSheet";
 
 // ─────────────────────────────────────────────────────
 // Helpers
@@ -35,7 +39,9 @@ const parsePositiveInt = (value: string | null): number | undefined => {
 
 export function EnrollmentsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const [editingEnrollment, setEditingEnrollment] = useState<Enrollment | null>(
+    null,
+  );
   // ───────────────────────────────────────────────────
   // Contexto global
   // ───────────────────────────────────────────────────
@@ -319,7 +325,6 @@ export function EnrollmentsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Matrículas</h1>
@@ -339,9 +344,7 @@ export function EnrollmentsPage() {
           </Button>
         )}
       </div>
-
       {/* Sin contexto */}
-
       {!hasContext ? (
         <Alert>
           <AlertCircle className="size-4" />
@@ -419,7 +422,10 @@ export function EnrollmentsPage() {
 
             {!isLoading && !isError && data && (
               <>
-                <EnrollmentTable enrollments={data.data} />
+                <EnrollmentTable
+                  enrollments={data.data}
+                  onEdit={setEditingEnrollment}
+                />
 
                 {data.meta.total > 0 && (
                   <div className="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
@@ -468,6 +474,16 @@ export function EnrollmentsPage() {
           </CardContent>
         </Card>
       )}
+      <EnrollmentEditSheet
+        enrollment={editingEnrollment}
+        open={Boolean(editingEnrollment)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingEnrollment(null);
+          }
+        }}
+      />
+      ;
     </div>
   );
 }

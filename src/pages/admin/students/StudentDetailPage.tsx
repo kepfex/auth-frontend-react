@@ -18,6 +18,7 @@ import { GuardianManager } from "@/features/students/components/guardians/Guardi
 import { StudentEmptyTab } from "@/features/students/components/detail/StudentEmptyTab";
 import { StudentEditSheet } from "@/features/students/components/detail/StudentEditSheet.tsx";
 import { useState } from "react";
+import { EnrollmentHistory } from "@/features/enrollments/components/EnrollmentHistory";
 
 const STUDENT_TABS = [
   "information",
@@ -154,11 +155,7 @@ export const StudentDetailPage = () => {
         </TabsContent>
 
         <TabsContent value="enrollments">
-          <StudentEmptyTab
-            icon={CalendarDays}
-            title="Sin gestión de matrículas"
-            description="La gestión e historial de matrículas se implementará en el siguiente módulo."
-          />
+          <EnrollmentHistory studentId={student.id} />
         </TabsContent>
 
         <TabsContent value="attendance">
