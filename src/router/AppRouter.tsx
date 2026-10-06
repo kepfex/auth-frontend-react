@@ -13,6 +13,7 @@ import { StudentsPage } from "@/pages/admin/students/StudentsPage";
 import { StudentCreatePage } from "@/pages/admin/students/StudentCreatePage";
 import { StudentGuardianSetupPage } from "@/pages/admin/students/StudentGuardianSetupPage";
 import { StudentDetailPage } from "@/pages/admin/students/StudentDetailPage";
+import { EnrollmentsPage } from "@/pages/admin/enrollments/EnrollmentsPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -33,26 +34,16 @@ export const AppRouter = () => (
           />
           <Route path="classrooms" element={<ClassroomsPage />} />
 
-          <Route
-            path="students"
-            element={<StudentsPage />}
-          />
+          <Route path="students" element={<StudentsPage />} />
 
-          <Route
-            path="students/new"
-            element={<StudentCreatePage />}
-          />
+          <Route path="students/new" element={<StudentCreatePage />} />
 
           <Route
             path="students/:studentId/setup/guardians"
-            element={
-              <StudentGuardianSetupPage />
-            }
+            element={<StudentGuardianSetupPage />}
           />
-          <Route
-            path="students/:studentId"
-            element={<StudentDetailPage />}
-          />
+          <Route path="students/:studentId" element={<StudentDetailPage />} />
+          <Route path="enrollments" element={<EnrollmentsPage />} />
         </Route>
       </Route>
 

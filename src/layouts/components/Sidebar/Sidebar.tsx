@@ -1,5 +1,5 @@
 import type { MenuGroup } from "@/layouts/schemas/layout.schema";
-import { BarChart3, CalendarCheck2, FileSpreadsheet, GraduationCap, LayoutDashboard, School, Sliders, Users } from "lucide-react";
+import { BarChart3, CalendarCheck2, ClipboardList, FileSpreadsheet, GraduationCap, LayoutDashboard, School, Sliders, Users } from "lucide-react";
 import SidebarItem from "./SidebarItem";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -20,6 +20,12 @@ const MENU_GROUPS: MenuGroup[] = [
         label: 'Estudiantes',
         icon: GraduationCap,
         path: '/admin/students'
+      },
+      {
+        id: 'enrollments',
+        label: 'Matrículas',
+        icon: ClipboardList,
+        path: '/admin/enrollments'
       },
       {
         id: 'asistencia',
