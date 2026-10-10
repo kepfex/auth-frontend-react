@@ -16,6 +16,7 @@ import { StudentDetailPage } from "@/pages/admin/students/StudentDetailPage";
 import { EnrollmentsPage } from "@/pages/admin/enrollments/EnrollmentsPage";
 import { NewEnrollmentPage } from "@/pages/admin/enrollments/NewEnrollmentPage";
 import { AttendanceSettingsPage } from "@/pages/admin/attendance/AttendanceSettingsPage";
+import { AttendanceKioskPage } from "@/pages/kiosk/AttendanceKioskPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -27,6 +28,10 @@ export const AppRouter = () => (
 
       {/* Rutas privadas — protegidas por AuthGuard */}
       <Route element={<AuthGuard />}>
+        {/* Kiosco operacional */}
+        <Route path="/kiosk/attendance" element={<AttendanceKioskPage />} />
+        
+        {/* Rutas administrativas */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="academic-years" element={<AcademicYearsPage />} />

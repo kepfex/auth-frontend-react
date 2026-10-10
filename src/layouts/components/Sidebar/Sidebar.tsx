@@ -1,5 +1,5 @@
 import type { MenuGroup } from "@/layouts/schemas/layout.schema";
-import { BarChart3, CalendarCheck2, CalendarClock, ClipboardList, FileSpreadsheet, GraduationCap, LayoutDashboard, School, Sliders, Users } from "lucide-react";
+import { BarChart3, CalendarCheck2, CalendarClock, ClipboardList, FileSpreadsheet, GraduationCap, LayoutDashboard, ScanQrCodeIcon, School, Sliders, Users } from "lucide-react";
 import SidebarItem from "./SidebarItem";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -32,6 +32,12 @@ const MENU_GROUPS: MenuGroup[] = [
         label: 'Horarios y Calendario',
         icon: CalendarClock,
         path: '/admin/attendance-settings'
+      },
+      {
+        id: 'attendance-kiosk',
+        label: 'Kiosco QR',
+        icon: ScanQrCodeIcon,
+        path: '/kiosk/attendance'
       },
       {
         id: 'asistencia',
