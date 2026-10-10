@@ -1,4 +1,6 @@
-import { apiClient } from "@/api/client";
+import {
+  publicApiClient,
+} from "@/api/public-client";
 
 import type {
   AttendanceScanResponse,
@@ -9,9 +11,13 @@ export const attendanceScanApi = {
   scan: async (
     payload: ScanAttendanceQrRequest,
   ): Promise<AttendanceScanResponse> => {
-    const { data } = await apiClient.post<{
-      data: AttendanceScanResponse;
-    }>("/attendance/scan", payload);
+    const { data } =
+      await publicApiClient.post<{
+        data: AttendanceScanResponse;
+      }>(
+        "/attendance/scan",
+        payload,
+      );
 
     return data.data;
   },

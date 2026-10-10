@@ -13,10 +13,17 @@ import { prepareKioskAudio } from "../lib/kiosk-audio";
 // ─────────────────────────────────────────────────────
 // Props
 // ─────────────────────────────────────────────────────
+export interface KioskCameraDevice {
+  deviceId: string;
+
+  label: string;
+}
 
 interface QrCameraScannerProps {
   disabled?: boolean;
+  cameraDeviceId: string | null;
 
+  onCameraDevicesChange: (devices: KioskCameraDevice[]) => void;
   onScan: (value: string) => void | Promise<void>;
 }
 
@@ -28,6 +35,8 @@ type CameraState = "idle" | "starting" | "active" | "error";
 
 export function QrCameraScanner({
   disabled = false,
+  cameraDeviceId,
+  onCameraDevicesChange,
   onScan,
 }: QrCameraScannerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -108,15 +117,10 @@ export function QrCameraScanner({
     setCameraState("starting");
 
     try {
-      /*
-       * El gesto del usuario que inicia la
-       * cámara también habilita el audio.
-       */
       await prepareKioskAudio();
 
       const reader = new BrowserQRCodeReader(undefined, {
         delayBetweenScanAttempts: 120,
-
         delayBetweenScanSuccess: 500,
       });
 
@@ -124,19 +128,33 @@ export function QrCameraScanner({
         {
           audio: false,
 
-          video: {
-            facingMode: {
-              ideal: "environment",
-            },
+          video: cameraDeviceId
+            ? {
+                deviceId: {
+                  exact: cameraDeviceId,
+                },
 
-            width: {
-              ideal: 1280,
-            },
+                width: {
+                  ideal: 1280,
+                },
 
-            height: {
-              ideal: 720,
-            },
-          },
+                height: {
+                  ideal: 720,
+                },
+              }
+            : {
+                facingMode: {
+                  ideal: "environment",
+                },
+
+                width: {
+                  ideal: 1280,
+                },
+
+                height: {
+                  ideal: 720,
+                },
+              },
         },
 
         videoRef.current,
@@ -152,13 +170,6 @@ export function QrCameraScanner({
             return;
           }
 
-          /*
-           * Protección local contra el mismo QR
-           * permaneciendo frente a la cámara.
-           *
-           * Laravel sigue siendo la autoridad
-           * definitiva para duplicados.
-           */
           const now = Date.now();
 
           const previous = lastScanRef.current;
@@ -177,6 +188,22 @@ export function QrCameraScanner({
       );
 
       controlsRef.current = controls;
+
+      // ───────────────────────────────────────────────
+      // AQUÍ enumeramos las cámaras
+      // ───────────────────────────────────────────────
+
+      const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+
+      const cameras = mediaDevices
+        .filter((device) => device.kind === "videoinput")
+        .map((device, index) => ({
+          deviceId: device.deviceId,
+
+          label: device.label || `Cámara ${index + 1}`,
+        }));
+
+      onCameraDevicesChange(cameras);
 
       setCameraState("active");
     } catch (error) {
@@ -218,7 +245,7 @@ export function QrCameraScanner({
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-black">
+      <div className="relative aspect-4/3 overflow-hidden rounded-3xl bg-black">
         <video
           ref={videoRef}
           muted

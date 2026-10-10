@@ -104,11 +104,11 @@ export function AttendanceScanFeedback({
 
   const EventIcon = attendance?.event_type === "exit" ? LogOut : LogIn;
 
-  const fullName = student
-    ? [student.first_names, student.paternal_surname, student.maternal_surname]
-        .filter(Boolean)
-        .join(" ")
-    : null;
+  // const fullName = student
+  //   ? [student.first_names, student.paternal_surname, student.maternal_surname]
+  //       .filter(Boolean)
+  //       .join(" ")
+  //   : null;
 
   return (
     <Card
@@ -142,12 +142,20 @@ export function AttendanceScanFeedback({
             </div>
 
             <div className="min-w-0">
-              <p className="truncate text-lg font-semibold">{fullName}</p>
+              {/* <p className="truncate text-lg font-semibold">{fullName}</p> */}
 
-              {student.student_code && (
-                <p className="text-sm text-muted-foreground">
-                  {student.student_code}
-                </p>
+              {student && (
+                <div className="flex items-center gap-4 rounded-xl bg-muted/40 p-4">
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-background">
+                    <UserRound className="size-6" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate text-lg font-semibold">
+                      {student.display_name}
+                    </p>
+                  </div>
+                </div>
               )}
             </div>
           </div>

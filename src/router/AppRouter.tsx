@@ -26,11 +26,13 @@ export const AppRouter = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
+      {/* Kiosco público */}
+
+      <Route path="/kiosk/attendance" element={<AttendanceKioskPage />} />
+
       {/* Rutas privadas — protegidas por AuthGuard */}
       <Route element={<AuthGuard />}>
-        {/* Kiosco operacional */}
-        <Route path="/kiosk/attendance" element={<AttendanceKioskPage />} />
-        
+      
         {/* Rutas administrativas */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />

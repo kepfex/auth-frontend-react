@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Expand, LogOut, ScanLine } from "lucide-react";
+import { Expand, LogOut, ScanLine, Wifi, WifiOff } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +17,17 @@ import { playKioskTone } from "@/features/attendance-kiosk/lib/kiosk-audio";
 import type { AttendanceScanResponse } from "@/features/attendance-kiosk/types/attendance-scan.types";
 
 import { getApiErrorMessage } from "@/utils/api-error";
+
+import type { KioskCameraDevice } from "@/features/attendance-kiosk/components/QrCameraScanner";
+
+import { useKeyboardQrScanner } from "@/features/attendance-kiosk/hooks/useKeyboardQrScanner";
+
+import { useOnlineStatus } from "@/features/attendance-kiosk/hooks/useOnlineStatus";
+
+import { useScreenWakeLock } from "@/features/attendance-kiosk/hooks/useScreenWakeLock";
+
+import { useKioskPreferencesStore } from "@/features/attendance-kiosk/store/kiosk-preferences.store";
+import { KioskSettingsDialog } from "@/features/attendance-kiosk/components/KioskSettingsDialog";
 
 export function AttendanceKioskPage() {
   const navigate = useNavigate();
@@ -38,6 +49,30 @@ export function AttendanceKioskPage() {
   const lockRef = useRef(false);
 
   const unlockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [cameras, setCameras] = useState<KioskCameraDevice[]>([]);
+
+  const isOnline = useOnlineStatus();
+
+  const cameraDeviceId = useKioskPreferencesStore(
+    (state) => state.cameraDeviceId,
+  );
+
+  const soundEnabled = useKioskPreferencesStore((state) => state.soundEnabled);
+
+  const vibrationEnabled = useKioskPreferencesStore(
+    (state) => state.vibrationEnabled,
+  );
+
+  const keepScreenAwake = useKioskPreferencesStore(
+    (state) => state.keepScreenAwake,
+  );
+
+  const keyboardScannerEnabled = useKioskPreferencesStore(
+    (state) => state.keyboardScannerEnabled,
+  );
+
+  useScreenWakeLock(keepScreenAwake);
 
   useEffect(() => {
     return () => {
@@ -72,6 +107,18 @@ export function AttendanceKioskPage() {
       setConnectionError(null);
 
       try {
+        if (!navigator.onLine) {
+          setConnectionError(
+            "El dispositivo se encuentra sin conexión de red.",
+          );
+
+          lockRef.current = false;
+
+          setLocked(false);
+
+          return;
+        }
+
         const result = await scanQr({
           qr,
         });
@@ -83,18 +130,28 @@ export function AttendanceKioskPage() {
             result.attendance?.status === "late" ||
             result.attendance?.status === "early"
           ) {
-            playKioskTone("warning");
-
-            navigator.vibrate?.([80, 60, 80]);
+            if (soundEnabled) {
+              playKioskTone("warning");
+            }
+            if (vibrationEnabled) {
+              navigator.vibrate?.([80, 60, 80]);
+            }
           } else {
-            playKioskTone("success");
+            if (soundEnabled) {
+              playKioskTone("success");
+            }
 
-            navigator.vibrate?.(100);
+            if (vibrationEnabled) {
+              navigator.vibrate?.(100);
+            }
           }
         } else {
-          playKioskTone(result.result === "duplicate" ? "warning" : "error");
-
-          navigator.vibrate?.([150, 80, 150]);
+          if (soundEnabled) {
+            playKioskTone(result.result === "duplicate" ? "warning" : "error");
+          }
+          if (vibrationEnabled) {
+            navigator.vibrate?.([150, 80, 150]);
+          }
         }
       } catch (error) {
         setConnectionError(
@@ -104,13 +161,21 @@ export function AttendanceKioskPage() {
           ),
         );
 
-        playKioskTone("error");
+        if (soundEnabled) {
+          playKioskTone("error");
+        }
       } finally {
         unlockAfterFeedback();
       }
     },
     [scanQr, unlockAfterFeedback],
   );
+
+  useKeyboardQrScanner({
+    enabled: keyboardScannerEnabled && !locked && !isPending,
+
+    onScan: handleScan,
+  });
 
   const toggleFullscreen = async () => {
     try {
@@ -148,6 +213,26 @@ export function AttendanceKioskPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <div
+              className={
+                isOnline
+                  ? "flex items-center gap-1.5 text-sm text-emerald-600"
+                  : "flex items-center gap-1.5 text-sm text-destructive"
+              }
+            >
+              {isOnline ? (
+                <Wifi className="size-4" />
+              ) : (
+                <WifiOff className="size-4" />
+              )}
+
+              <span className="hidden md:inline">
+                {isOnline ? "En línea" : "Sin conexión"}
+              </span>
+            </div>
+
+            <KioskSettingsDialog cameras={cameras} />
+
             <Button
               type="button"
               variant="outline"
@@ -179,7 +264,12 @@ export function AttendanceKioskPage() {
         {/* Camera */}
 
         <section>
-          <QrCameraScanner disabled={locked || isPending} onScan={handleScan} />
+          <QrCameraScanner
+            disabled={locked || isPending || !isOnline}
+            cameraDeviceId={cameraDeviceId}
+            onCameraDevicesChange={setCameras}
+            onScan={handleScan}
+          />
         </section>
 
         {/* Feedback */}

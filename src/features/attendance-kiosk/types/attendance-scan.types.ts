@@ -1,63 +1,70 @@
-export type QrScanResult = "accepted" | "rejected" | "duplicate" | "invalid";
+export type QrScanResult =
+  | "accepted"
+  | "rejected"
+  | "duplicate"
+  | "invalid";
 
-export type AttendanceMarkStatus = "on_time" | "late" | "early" | "unmatched";
+export type AttendanceMarkStatus =
+  | "on_time"
+  | "late"
+  | "early"
+  | "unmatched";
 
-export type AttendanceEventType = "entry" | "exit";
+export type AttendanceEventType =
+  | "entry"
+  | "exit";
 
 export interface AttendanceScanStudent {
-  id: number;
-
-  student_code: string | null;
-
-  first_names: string;
-
-  paternal_surname: string;
-
-  maternal_surname: string | null;
+  display_name: string;
 }
 
 export interface AttendanceScanMark {
-  attendance_day_id: number;
+  event_type:
+    AttendanceEventType;
 
-  attendance_mark_id: number;
+  event_type_label:
+    string;
 
-  date: string | null;
+  expected_time:
+    string | null;
 
-  day_status: string | null;
+  recorded_at:
+    string;
 
-  event_type: AttendanceEventType;
+  status:
+    AttendanceMarkStatus;
 
-  event_type_label: string;
+  status_label:
+    string;
 
-  expected_time: string | null;
-
-  recorded_at: string;
-
-  status: AttendanceMarkStatus;
-
-  status_label: string;
-
-  difference_minutes: number | null;
+  difference_minutes:
+    number | null;
 }
 
 export interface AttendanceScanResponse {
-  id: number;
+  accepted:
+    boolean;
 
-  accepted: boolean;
+  result:
+    QrScanResult;
 
-  result: QrScanResult;
+  result_label:
+    string;
 
-  result_label: string;
+  reason:
+    string | null;
 
-  reason: string | null;
+  message:
+    string;
 
-  message: string;
+  scanned_at:
+    string;
 
-  scanned_at: string;
+  student:
+    AttendanceScanStudent | null;
 
-  student: AttendanceScanStudent | null;
-
-  attendance: AttendanceScanMark | null;
+  attendance:
+    AttendanceScanMark | null;
 }
 
 export interface ScanAttendanceQrRequest {
