@@ -1,7 +1,12 @@
 import { apiClient } from "@/api/client";
 import type { PaginatedResponse } from "@/shared/types/shared.types";
-import type { AttendanceCalendarException, AttendanceCalendarExceptionFilters, CreateAttendanceCalendarExceptionRequest, UpdateAttendanceCalendarExceptionRequest } from "../types/attendance-schedule.types";
-
+import type {
+  AttendanceCalendarException,
+  AttendanceCalendarExceptionFilters,
+  CreateAttendanceCalendarExceptionRequest,
+  CreateScheduleOverrideExceptionRequest,
+  UpdateAttendanceCalendarExceptionRequest,
+} from "../types/attendance-schedule.types";
 
 export const attendanceCalendarExceptionsApi = {
   // ───────────────────────────────────────────────────
@@ -10,18 +15,12 @@ export const attendanceCalendarExceptionsApi = {
 
   getAll: async (
     filters: AttendanceCalendarExceptionFilters = {},
-  ): Promise<
-    PaginatedResponse<AttendanceCalendarException>
-  > => {
-    const { data } =
-      await apiClient.get<
-        PaginatedResponse<AttendanceCalendarException>
-      >(
-        "/attendance-calendar-exceptions",
-        {
-          params: filters,
-        },
-      );
+  ): Promise<PaginatedResponse<AttendanceCalendarException>> => {
+    const { data } = await apiClient.get<
+      PaginatedResponse<AttendanceCalendarException>
+    >("/attendance-calendar-exceptions", {
+      params: filters,
+    });
 
     return data;
   },
@@ -33,12 +32,9 @@ export const attendanceCalendarExceptionsApi = {
   getById: async (
     exceptionId: number,
   ): Promise<AttendanceCalendarException> => {
-    const { data } =
-      await apiClient.get<{
-        data: AttendanceCalendarException;
-      }>(
-        `/attendance-calendar-exceptions/${exceptionId}`,
-      );
+    const { data } = await apiClient.get<{
+      data: AttendanceCalendarException;
+    }>(`/attendance-calendar-exceptions/${exceptionId}`);
 
     return data.data;
   },
@@ -50,13 +46,9 @@ export const attendanceCalendarExceptionsApi = {
   create: async (
     payload: CreateAttendanceCalendarExceptionRequest,
   ): Promise<AttendanceCalendarException> => {
-    const { data } =
-      await apiClient.post<{
-        data: AttendanceCalendarException;
-      }>(
-        "/attendance-calendar-exceptions",
-        payload,
-      );
+    const { data } = await apiClient.post<{
+      data: AttendanceCalendarException;
+    }>("/attendance-calendar-exceptions", payload);
 
     return data.data;
   },
@@ -69,13 +61,19 @@ export const attendanceCalendarExceptionsApi = {
     exceptionId: number,
     payload: UpdateAttendanceCalendarExceptionRequest,
   ): Promise<AttendanceCalendarException> => {
-    const { data } =
-      await apiClient.patch<{
-        data: AttendanceCalendarException;
-      }>(
-        `/attendance-calendar-exceptions/${exceptionId}`,
-        payload,
-      );
+    const { data } = await apiClient.patch<{
+      data: AttendanceCalendarException;
+    }>(`/attendance-calendar-exceptions/${exceptionId}`, payload);
+
+    return data.data;
+  },
+
+  createScheduleOverride: async (
+    payload: CreateScheduleOverrideExceptionRequest,
+  ): Promise<AttendanceCalendarException> => {
+    const { data } = await apiClient.post<{
+      data: AttendanceCalendarException;
+    }>("/attendance-calendar-exceptions/schedule-override", payload);
 
     return data.data;
   },

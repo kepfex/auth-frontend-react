@@ -10,6 +10,7 @@ import { attendanceCalendarExceptionsApi } from "../api/attendance-calendar-exce
 import type {
   AttendanceCalendarExceptionFilters,
   CreateAttendanceCalendarExceptionRequest,
+  CreateScheduleOverrideExceptionRequest,
   UpdateAttendanceCalendarExceptionRequest,
 } from "../types/attendance-schedule.types";
 
@@ -113,6 +114,36 @@ export const useUpdateAttendanceCalendarException = (exceptionId: number) => {
 
       queryClient.invalidateQueries({
         queryKey: ATTENDANCE_CALENDAR_EXCEPTION_KEYS.lists(),
+      });
+    },
+  });
+};
+
+// ─────────────────────────────────────────────────────
+// Crear Schedule Override Exception 
+// ─────────────────────────────────────────────────────
+export const useCreateScheduleOverrideException = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateScheduleOverrideExceptionRequest) =>
+      attendanceCalendarExceptionsApi.createScheduleOverride(payload),
+
+    onSuccess: (exception) => {
+      queryClient.setQueryData(
+        ATTENDANCE_CALENDAR_EXCEPTION_KEYS.detail(exception.id),
+        exception,
+      );
+
+      queryClient.invalidateQueries({
+        queryKey: ATTENDANCE_CALENDAR_EXCEPTION_KEYS.lists(),
+      });
+
+      /*
+       * También se creó un Schedule override.
+       */
+      queryClient.invalidateQueries({
+        queryKey: ["attendance-schedules"],
       });
     },
   });

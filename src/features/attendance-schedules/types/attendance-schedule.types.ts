@@ -255,3 +255,37 @@ export interface UpdateAttendanceCalendarExceptionRequest {
 
   is_active?: boolean;
 }
+
+export interface AttendanceOverrideEventRequest {
+  event_type: AttendanceEventType;
+
+  expected_time: string;
+
+  tolerance_minutes: number;
+
+  window_before_minutes: number;
+
+  window_after_minutes: number;
+}
+
+export interface CreateScheduleOverrideExceptionRequest {
+  academic_year_id: number;
+
+  educational_level_id: number;
+
+  grade_section_id: number | null;
+
+  date: string;
+
+  name: string;
+
+  reason?: string | null;
+
+  is_active?: boolean;
+
+  schedule: {
+    name: string;
+
+    events: AttendanceOverrideEventRequest[];
+  };
+}
