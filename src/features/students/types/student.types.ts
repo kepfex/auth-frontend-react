@@ -1,6 +1,12 @@
-import type { CreatePersonRequest, Person, UpdatePersonRequest } from "./person.types";
+import type {
+  CreatePersonRequest,
+  Person,
+  UpdatePersonRequest,
+} from "./person.types";
 
 export type StudentStatus = "activo" | "inactivo" | "egresado";
+
+export type StudentQrStatus = "active" | "inactive" | "missing";
 
 export interface Student {
   id: number;
@@ -10,6 +16,8 @@ export interface Student {
   status: StudentStatus;
 
   person: Person;
+
+  qr_status?: StudentQrStatus;
 
   created_at: string;
 }
@@ -26,14 +34,12 @@ interface StudentBaseRequest {
   status?: StudentStatus;
 }
 
-export interface CreateStudentWithPersonRequest
-  extends StudentBaseRequest {
+export interface CreateStudentWithPersonRequest extends StudentBaseRequest {
   person: CreatePersonRequest;
   person_id?: never;
 }
 
-export interface CreateStudentWithPersonIdRequest
-  extends StudentBaseRequest {
+export interface CreateStudentWithPersonIdRequest extends StudentBaseRequest {
   person_id: number;
   person?: never;
 }

@@ -3,6 +3,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   Loader2,
+  QrCode,
   UserRound,
   UsersRound,
 } from "lucide-react";
@@ -19,11 +20,13 @@ import { StudentEmptyTab } from "@/features/students/components/detail/StudentEm
 import { StudentEditSheet } from "@/features/students/components/detail/StudentEditSheet.tsx";
 import { useState } from "react";
 import { EnrollmentHistory } from "@/features/enrollments/components/EnrollmentHistory";
+import { StudentQrTab } from "@/features/students/components/detail/StudentQrTab";
 
 const STUDENT_TABS = [
   "information",
   "guardians",
   "enrollments",
+  "qr",
   "attendance",
 ] as const;
 
@@ -140,6 +143,11 @@ export const StudentDetailPage = () => {
             Matrículas
           </TabsTrigger>
 
+          <TabsTrigger value="qr">
+            <QrCode className="size-4" />
+            Código QR
+          </TabsTrigger>
+
           <TabsTrigger value="attendance">
             <ClipboardCheck className="size-4" />
             Asistencia
@@ -156,6 +164,10 @@ export const StudentDetailPage = () => {
 
         <TabsContent value="enrollments">
           <EnrollmentHistory studentId={student.id} />
+        </TabsContent>
+
+        <TabsContent value="qr">
+          <StudentQrTab studentId={student.id} />
         </TabsContent>
 
         <TabsContent value="attendance">

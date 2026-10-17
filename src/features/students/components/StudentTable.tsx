@@ -1,12 +1,6 @@
-import {
-  Eye,
-  MoreHorizontal,
-  Pencil,
-} from "lucide-react";
+import { Eye, MoreHorizontal, Pencil } from "lucide-react";
 
-import {
-  Button,
-} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import {
   DropdownMenu,
@@ -26,32 +20,21 @@ import {
 
 import { StudentStatusBadge } from "./StudentStatusBadge";
 
-import type {
-  Student,
-} from "../types/student.types";
+import type { Student } from "../types/student.types";
+import { StudentQrStatusBadge } from "./StudentQrStatusBadge";
 
 interface StudentTableProps {
   students: Student[];
 
-  onView: (
-    student: Student,
-  ) => void;
+  onView: (student: Student) => void;
 
-  onEdit: (
-    student: Student,
-  ) => void;
+  onEdit: (student: Student) => void;
 }
 
-const getFullName = (
-  student: Student,
-): string => {
+const getFullName = (student: Student): string => {
   const { person } = student;
 
-  return [
-    person.paternal_surname,
-    person.maternal_surname,
-    person.first_names,
-  ]
+  return [person.paternal_surname, person.maternal_surname, person.first_names]
     .filter(Boolean)
     .join(" ");
 };
@@ -66,25 +49,17 @@ export const StudentTable = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              Código
-            </TableHead>
+            <TableHead>Código</TableHead>
 
-            <TableHead>
-              Estudiante
-            </TableHead>
+            <TableHead>Estudiante</TableHead>
 
-            <TableHead>
-              Documento
-            </TableHead>
+            <TableHead>Documento</TableHead>
 
-            <TableHead>
-              Estado
-            </TableHead>
+            <TableHead>Estado</TableHead>
 
-            <TableHead className="w-17.5 text-right">
-              Acciones
-            </TableHead>
+            <TableHead>Código QR</TableHead>
+
+            <TableHead className="w-17.5 text-right">Acciones</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -93,9 +68,7 @@ export const StudentTable = ({
             <TableRow
               key={student.id}
               className="cursor-pointer"
-              onClick={() =>
-                onView(student)
-              }
+              onClick={() => onView(student)}
             >
               <TableCell className="font-medium">
                 {student.student_code}
@@ -103,9 +76,7 @@ export const StudentTable = ({
 
               <TableCell>
                 <div className="flex flex-col">
-                  <span className="font-medium">
-                    {getFullName(student)}
-                  </span>
+                  <span className="font-medium">{getFullName(student)}</span>
 
                   {student.person.email && (
                     <span className="text-sm text-muted-foreground">
@@ -117,67 +88,42 @@ export const StudentTable = ({
 
               <TableCell>
                 <div className="flex flex-col">
-                  <span>
-                    {
-                      student.person
-                        .document_number
-                    }
-                  </span>
+                  <span>{student.person.document_number}</span>
 
                   <span className="text-xs text-muted-foreground">
-                    {
-                      student.person
-                        .document_type
-                    }
+                    {student.person.document_type}
                   </span>
                 </div>
               </TableCell>
 
               <TableCell>
-                <StudentStatusBadge
-                  status={student.status}
-                />
+                <StudentStatusBadge status={student.status} />
+              </TableCell>
+
+              <TableCell>
+                <StudentQrStatusBadge status={student.qr_status} />
               </TableCell>
 
               <TableCell
                 className="text-right"
-                onClick={(event) =>
-                  event.stopPropagation()
-                }
+                onClick={(event) => event.stopPropagation()}
               >
                 <DropdownMenu>
-                  <DropdownMenuTrigger
-                    asChild
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                    >
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
                       <MoreHorizontal className="size-4" />
 
-                      <span className="sr-only">
-                        Abrir acciones
-                      </span>
+                      <span className="sr-only">Abrir acciones</span>
                     </Button>
                   </DropdownMenuTrigger>
 
-                  <DropdownMenuContent
-                    align="end"
-                  >
-                    <DropdownMenuItem
-                      onClick={() =>
-                        onView(student)
-                      }
-                    >
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onView(student)}>
                       <Eye className="size-4" />
                       Ver detalle
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem
-                      onClick={() =>
-                        onEdit(student)
-                      }
-                    >
+                    <DropdownMenuItem onClick={() => onEdit(student)}>
                       <Pencil className="size-4" />
                       Editar
                     </DropdownMenuItem>
