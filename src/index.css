@@ -308,3 +308,52 @@
     border-radius: 10px;
   }
 }
+
+/* Estilos para la generacion de credenciales  */
+
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    width: 210mm !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #credential-print-root,
+  #credential-print-root * {
+    visibility: visible;
+  }
+
+  #credential-print-root {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: grid !important;
+    grid-template-columns: 85.6mm 85.6mm !important;
+    gap: 5mm !important;
+    width: 176.2mm;
+    margin: 0;
+    padding: 0;
+  }
+
+  .credential-card {
+    width: 85.6mm !important;
+    height: 54mm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+}

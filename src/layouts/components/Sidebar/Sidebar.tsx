@@ -1,5 +1,18 @@
 import type { MenuGroup } from "@/layouts/schemas/layout.schema";
-import { BarChart3, CalendarCheck2, CalendarClock, ClipboardList, FileSpreadsheet, GraduationCap, LayoutDashboard, ScanQrCodeIcon, School, Sliders, Users } from "lucide-react";
+import {
+  BarChart3,
+  CalendarCheck2,
+  CalendarClock,
+  ClipboardList,
+  FileSpreadsheet,
+  GraduationCap,
+  IdCard,
+  LayoutDashboard,
+  ScanQrCodeIcon,
+  School,
+  Sliders,
+  Users,
+} from "lucide-react";
 import SidebarItem from "./SidebarItem";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -7,90 +20,99 @@ import { isRouteActive } from "@/layouts/utils/navigation";
 
 const MENU_GROUPS: MenuGroup[] = [
   {
-    groupTitle: 'Menú Principal',
+    groupTitle: "Menú Principal",
     items: [
       {
-        id: 'dashboard',
-        label: 'Inicio / Panel',
+        id: "dashboard",
+        label: "Inicio / Panel",
         icon: LayoutDashboard,
-        path: '/admin'
+        path: "/admin",
       },
       {
-        id: 'students',
-        label: 'Estudiantes',
+        id: "students",
+        label: "Estudiantes",
         icon: GraduationCap,
-        path: '/admin/students'
+        path: "/admin/students",
       },
       {
-        id: 'enrollments',
-        label: 'Matrículas',
+        id: "enrollments",
+        label: "Matrículas",
         icon: ClipboardList,
-        path: '/admin/enrollments'
+        path: "/admin/enrollments",
       },
       {
-        id: 'attendance-settings',
-        label: 'Horarios y Calendario',
+        id: "attendance-settings",
+        label: "Horarios y Calendario",
         icon: CalendarClock,
-        path: '/admin/attendance-settings'
+        path: "/admin/attendance-settings",
       },
       {
-        id: 'attendance-kiosk',
-        label: 'Kiosco QR',
+        id: "attendance-kiosk",
+        label: "Kiosco QR",
         icon: ScanQrCodeIcon,
-        path: '/kiosk/attendance'
+        path: "/kiosk/attendance",
       },
       {
-        id: 'asistencia',
-        label: 'Gestión Asistencia',
+        id: "credentials",
+        label: "Credenciales escolares",
+        icon: IdCard,
+        path: "/admin/credentials",
+      },
+      {
+        id: "asistencia",
+        label: "Gestión Asistencia",
         icon: CalendarCheck2,
         items: [
-          { id: 'asistencia-toma', label: 'Toma de Asistencia' },
-          { id: 'asistencia-justificaciones', label: 'Inasistencias & Justificaciones' },
-          { id: 'asistencia-reportes', label: 'Reportes Mensuales' }
-        ]
+          { id: "asistencia-toma", label: "Toma de Asistencia" },
+          {
+            id: "asistencia-justificaciones",
+            label: "Inasistencias & Justificaciones",
+          },
+          { id: "asistencia-reportes", label: "Reportes Mensuales" },
+        ],
       },
       {
-        id: 'estudiantes',
-        label: 'Estudiantes',
+        id: "estudiantes",
+        label: "Estudiantes",
         icon: Users,
         items: [
-          { id: 'estudiantes-directorio', label: 'Directorio de Alumnos' },
-          { id: 'estudiantes-registro', label: 'Matrícula & Registro' },
-          { id: 'estudiantes-expediente', label: 'Expediente Académico' }
-        ]
+          { id: "estudiantes-directorio", label: "Directorio de Alumnos" },
+          { id: "estudiantes-registro", label: "Matrícula & Registro" },
+          { id: "estudiantes-expediente", label: "Expediente Académico" },
+        ],
       },
       {
-        id: 'academico',
-        label: 'Gestión Académica',
+        id: "academico",
+        label: "Gestión Académica",
         icon: School,
         items: [
           {
-            id: 'academico-anios',
-            label: 'Años Académicos',
-            path: '/admin/academic-years',
+            id: "academico-anios",
+            label: "Años Académicos",
+            path: "/admin/academic-years",
           },
           {
-            id: 'academico-level-grade-section',
-            label: 'Catálogo Base',
-            path: '/admin/academic-structure',
+            id: "academico-level-grade-section",
+            label: "Catálogo Base",
+            path: "/admin/academic-structure",
           },
           {
-            id: 'academico-aulas',
-            label: 'Aulas y Secciones',
-            path: '/admin/classrooms',
+            id: "academico-aulas",
+            label: "Aulas y Secciones",
+            path: "/admin/classrooms",
           },
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   {
-    groupTitle: 'Administración',
+    groupTitle: "Administración",
     items: [
-      { id: 'kpis', label: 'Estadísticas & KPIs', icon: BarChart3 },
-      { id: 'export', label: 'Exportación de Datos', icon: FileSpreadsheet },
-      { id: 'config', label: 'Configuración', icon: Sliders }
-    ]
-  }
+      { id: "kpis", label: "Estadísticas & KPIs", icon: BarChart3 },
+      { id: "export", label: "Exportación de Datos", icon: FileSpreadsheet },
+      { id: "config", label: "Configuración", icon: Sliders },
+    ],
+  },
 ];
 
 interface SidebarProps {
@@ -106,20 +128,13 @@ export default function Sidebar({
   openSubmenu,
   setOpenSubmenu,
 }: SidebarProps) {
-
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const activeGroup = MENU_GROUPS
-      .flatMap((group) => group.items)
-      .find((item) =>
-        item.items?.some((subItem) =>
-          isRouteActive(
-            subItem.path,
-            pathname
-          )
-        )
-      );
+    const activeGroup = MENU_GROUPS.flatMap((group) => group.items).find(
+      (item) =>
+        item.items?.some((subItem) => isRouteActive(subItem.path, pathname)),
+    );
 
     if (activeGroup) {
       setOpenSubmenu(activeGroup.id);
@@ -129,7 +144,7 @@ export default function Sidebar({
   return (
     <aside
       className={`transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 select-none z-20 h-full overflow-hidden
-        ${sidebarOpen ? 'w-64' : 'w-20'}`}
+        ${sidebarOpen ? "w-64" : "w-20"}`}
     >
       <div className="p-3 overflow-y-auto overflow-x-hidden space-y-6 flex-1 min-h-0">
         {MENU_GROUPS.map((group, groupIdx) => (

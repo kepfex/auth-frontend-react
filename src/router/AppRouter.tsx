@@ -17,6 +17,7 @@ import { EnrollmentsPage } from "@/pages/admin/enrollments/EnrollmentsPage";
 import { NewEnrollmentPage } from "@/pages/admin/enrollments/NewEnrollmentPage";
 import { AttendanceSettingsPage } from "@/pages/admin/attendance/AttendanceSettingsPage";
 import { AttendanceKioskPage } from "@/pages/kiosk/AttendanceKioskPage";
+import { CredentialsPage } from "@/pages/admin/credentials/CredentialsPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -32,7 +33,6 @@ export const AppRouter = () => (
 
       {/* Rutas privadas — protegidas por AuthGuard */}
       <Route element={<AuthGuard />}>
-      
         {/* Rutas administrativas */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
@@ -60,6 +60,8 @@ export const AppRouter = () => (
             path="attendance-settings"
             element={<AttendanceSettingsPage />}
           />
+
+          <Route path="credentials" element={<CredentialsPage />} />
         </Route>
       </Route>
 
