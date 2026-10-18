@@ -18,7 +18,6 @@ import { NewEnrollmentPage } from "@/pages/admin/enrollments/NewEnrollmentPage";
 import { AttendanceSettingsPage } from "@/pages/admin/attendance/AttendanceSettingsPage";
 import { AttendanceKioskPage } from "@/pages/kiosk/AttendanceKioskPage";
 import { CredentialsPage } from "@/pages/admin/credentials/CredentialsPage";
-import { CredentialsPrintPage } from "@/pages/admin/credentials/CredentialsPrintPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -64,11 +63,6 @@ export const AppRouter = () => (
 
           <Route path="credentials" element={<CredentialsPage />} />
         </Route>
-
-        <Route
-          path="/admin/credentials/print"
-          element={<CredentialsPrintPage />}
-        />
       </Route>
 
       {/* Ruta por defecto */}
