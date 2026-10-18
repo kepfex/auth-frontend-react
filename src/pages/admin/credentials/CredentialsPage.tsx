@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Printer, RefreshCw, QrCode, Loader2 } from "lucide-react";
+import {  RefreshCw, QrCode, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,10 @@ import { useAppContextStore } from "@/store/app-context.store";
 import { useClassrooms } from "@/features/classrooms/hooks/useClassrooms";
 
 import { useCredentialStudents } from "@/features/credential-print/hooks/useCredentialStudents";
-import { SchoolCredential } from "@/features/credential-print/components/SchoolCredential";
 import type { CredentialStudent } from "@/features/credential-print/types/credential-print.types";
 import { toast } from "sonner";
-import { credentialPrintApi } from "@/features/credential-print/api/credential-print.api";
 import axios from "axios";
+import { CredentialPreviewDialog } from "@/features/credential-print/components/CredentialPreviewDialog";
 
 export function CredentialsPage() {
   const academicYear = useAppContextStore((state) => state.academicYear);
@@ -84,7 +83,7 @@ function CredentialWorkspace({
 }: WorkspaceProps) {
   const [classroomId, setClassroomId] = useState<number | undefined>();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [showPreview, setShowPreview] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const { data: classrooms = [], isPending: loadingClassrooms } =
@@ -117,18 +116,18 @@ function CredentialWorkspace({
         : previous.filter((id) => id !== studentId),
     );
 
-    setShowPreview(false);
+    setPreviewOpen(false);
   };
 
   const toggleAll = (checked: boolean) => {
     setSelectedIds(checked ? eligibleIds : []);
-    setShowPreview(false);
+    setPreviewOpen(false);
   };
 
   const changeClassroom = (value: string) => {
     setClassroomId(value ? Number(value) : undefined);
     setSelectedIds([]);
-    setShowPreview(false);
+    setPreviewOpen(false);
   };
 
   const preparePreview = async () => {
@@ -143,7 +142,7 @@ function CredentialWorkspace({
     if (isProcessing || selectedIds.length === 0) return;
 
     setIsProcessing(true);
-    setShowPreview(false);
+    setPreviewOpen(false);
 
     try {
       // Forzar una consulta actualizada desde Laravel.
@@ -183,114 +182,13 @@ function CredentialWorkspace({
         return;
       }
 
-      setShowPreview(true);
+      setPreviewOpen(true);
 
       toast.success("Vista previa preparada", {
         description: `${validSelection.length} credencial(es) listas para revisar.`,
       });
     } catch (error) {
       toast.error("No se pudo preparar la vista previa", {
-        description: getCredentialErrorMessage(error),
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  function hasCredentialChanged(
-    previous: CredentialStudent,
-    current: CredentialStudent,
-  ): boolean {
-    return (
-      previous.enrollment_id !== current.enrollment_id ||
-      previous.student_code !== current.student_code ||
-      previous.full_name !== current.full_name ||
-      previous.qr?.uuid !== current.qr?.uuid ||
-      previous.qr?.is_active !== current.qr?.is_active ||
-      previous.student_status !== current.student_status
-    );
-  }
-
-  const printCredentials = async () => {
-    if (
-      isProcessing ||
-      !showPreview ||
-      !academicYearId ||
-      !classroomId ||
-      selectedStudents.length === 0
-    ) {
-      return;
-    }
-
-    setIsProcessing(true);
-
-    try {
-      // Consulta HTTP nueva, sin utilizar datos almacenados
-      // previamente en la caché de TanStack Query.
-      const latestData = await credentialPrintApi.getStudents(
-        academicYearId,
-        classroomId,
-      );
-
-      // Comprobar que el contexto académico sigue siendo el mismo.
-      if (
-        latestData.academic_year_id !== academicYearId ||
-        latestData.grade_section_id !== classroomId ||
-        latestData.grade !== data?.grade ||
-        latestData.section !== data?.section ||
-        latestData.level !== data?.level
-      ) {
-        setShowPreview(false);
-
-        toast.warning("Los datos del aula han cambiado", {
-          description:
-            "Actualiza la selección y prepara nuevamente las credenciales.",
-        });
-
-        return;
-      }
-
-      const latestById = new Map(
-        latestData.students.map((student) => [student.student_id, student]),
-      );
-
-      const changedStudents = selectedStudents.filter((previous) => {
-        const current = latestById.get(previous.student_id);
-
-        return (
-          !current ||
-          !isEligible(current) ||
-          hasCredentialChanged(previous, current)
-        );
-      });
-
-      if (changedStudents.length > 0) {
-        setShowPreview(false);
-
-        const currentEligibleIds = new Set(
-          latestData.students
-            .filter(isEligible)
-            .map((student) => student.student_id),
-        );
-
-        setSelectedIds((previous) =>
-          previous.filter((id) => currentEligibleIds.has(id)),
-        );
-
-        toast.warning("Las credenciales requieren actualización", {
-          description:
-            `${changedStudents.length} estudiante(s) presentan cambios. ` +
-            "Revisa la selección y prepara otra vista previa.",
-        });
-
-        return;
-      }
-
-      // Laravel confirmó que los datos seleccionados
-      // coinciden con la vista previa.
-      window.print();
-    } catch (error) {
-      toast.error("No se pudo iniciar la impresión", {
         description: getCredentialErrorMessage(error),
       });
     } finally {
@@ -472,42 +370,18 @@ function CredentialWorkspace({
         </Card>
       )}
 
-      {showPreview && selectedStudents.length > 0 && data && (
-        <section className="space-y-4">
-          <div className="flex items-center justify-between print:hidden">
-            <div>
-              <h2 className="text-lg font-semibold">Vista previa</h2>
-
-              <p className="text-sm text-muted-foreground">
-                {selectedStudents.length} credenciales listas
-              </p>
-            </div>
-
-            <Button
-              onClick={() => void printCredentials()}
-              disabled={isFetching}
-            >
-              <Printer className="size-4" />
-              Imprimir
-            </Button>
-          </div>
-
-          <div
-            id="credential-print-root"
-            className="credential-print-grid grid grid-cols-1 gap-4 sm:grid-cols-2"
-          >
-            {selectedStudents.map((student) => (
-              <SchoolCredential
-                key={student.student_id}
-                student={student}
-                academicYear={academicYearName}
-                level={data.level}
-                grade={data.grade}
-                section={data.section}
-              />
-            ))}
-          </div>
-        </section>
+      {data && (
+        <CredentialPreviewDialog
+          open={previewOpen}
+          onOpenChange={setPreviewOpen}
+          data={data}
+          students={selectedStudents}
+          academicYearName={academicYearName}
+          onInvalidated={() => {
+            setSelectedIds([]);
+            void refetch();
+          }}
+        />
       )}
     </div>
   );
