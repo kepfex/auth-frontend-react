@@ -124,11 +124,7 @@ export function CredentialPreviewDialog(props: Props) {
         academicYearName,
       });
 
-      toast.success("PDF generado correctamente", {
-        description:
-          `${validatedStudents.length} credencial(es) ` +
-          "preparadas para descargar.",
-      });
+      toast.success("PDF generado correctamente");
 
       onOpenChange(false);
     } catch (error) {

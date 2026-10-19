@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {  RefreshCw, QrCode, Loader2 } from "lucide-react";
+import { RefreshCw, QrCode, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,13 @@ import type { CredentialStudent } from "@/features/credential-print/types/creden
 import { toast } from "sonner";
 import axios from "axios";
 import { CredentialPreviewDialog } from "@/features/credential-print/components/CredentialPreviewDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function CredentialsPage() {
   const academicYear = useAppContextStore((state) => state.academicYear);
@@ -83,11 +90,37 @@ function CredentialWorkspace({
 }: WorkspaceProps) {
   const [classroomId, setClassroomId] = useState<number | undefined>();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [gradeId, setGradeId] = useState<number | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const { data: classrooms = [], isPending: loadingClassrooms } =
     useClassrooms();
+
+  // Grados únicos dentro del contexto académico actual.
+  const availableGrades = Array.from(
+    new Map(
+      classrooms.map((classroom) => [classroom.grade.id, classroom.grade]),
+    ).values(),
+  );
+
+  // Secciones disponibles para el grado seleccionado.
+  const availableClassrooms = gradeId
+    ? classrooms.filter((classroom) => classroom.grade.id === gradeId)
+    : [];
+
+  const changeGrade = (value: string) => {
+    setGradeId(Number(value));
+
+    // Limpiar la sección seleccionada.
+    setClassroomId(undefined);
+
+    // Limpiar los estudiantes seleccionados.
+    setSelectedIds([]);
+
+    // Cerrar el modal de vista previa.
+    setPreviewOpen(false);
+  };
 
   const { data, isPending, isFetching, isError, refetch } =
     useCredentialStudents(academicYearId, classroomId);
@@ -185,7 +218,8 @@ function CredentialWorkspace({
       setPreviewOpen(true);
 
       toast.success("Vista previa preparada", {
-        description: `${validSelection.length} credencial(es) listas para revisar.`,
+        description: `${validSelection.length} credencial${validSelection.length === 1 ? "" : "es"} ${validSelection.length === 1 ? "lista" : "listas"} para revisar.`,
+        position: "top-center",
       });
     } catch (error) {
       toast.error("No se pudo preparar la vista previa", {
@@ -214,43 +248,70 @@ function CredentialWorkspace({
           <CardTitle>Seleccionar aula</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Año académico</p>
-              <p className="font-medium">
+        <CardContent className="space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Año académico */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Año académico</p>
+
+              <div className="flex h-9 items-center text-sm">
                 {academicYearName || "Sin seleccionar"}
-              </p>
+              </div>
             </div>
 
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Nivel educativo</p>
-              <p className="font-medium">{levelName || "Sin seleccionar"}</p>
+            {/* Nivel educativo */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Nivel educativo</p>
+
+              <div className="flex h-9 items-center text-sm">
+                {levelName || "Sin seleccionar"}
+              </div>
             </div>
 
-            <div className="space-y-1">
-              <label
-                htmlFor="credential-classroom"
-                className="text-sm font-medium"
-              >
-                Grado y sección
-              </label>
+            {/* Grado */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Grado</label>
 
-              <select
-                id="credential-classroom"
-                value={classroomId ?? ""}
-                onChange={(event) => changeClassroom(event.target.value)}
+              <Select
+                value={gradeId?.toString() ?? ""}
+                onValueChange={changeGrade}
                 disabled={!academicYearId || loadingClassrooms || isProcessing}
-                className="h-9 w-full rounded-md border bg-background px-3 text-sm"
               >
-                <option value="">Seleccionar aula</option>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccionar grado" />
+                </SelectTrigger>
 
-                {classrooms.map((classroom) => (
-                  <option key={classroom.id} value={classroom.id}>
-                    {classroom.grade.name} · {classroom.section.name}
-                  </option>
-                ))}
-              </select>
+                <SelectContent>
+                  {availableGrades.map((grade) => (
+                    <SelectItem key={grade.id} value={String(grade.id)}>
+                      {grade.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Sección */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sección</label>
+
+              <Select
+                value={classroomId?.toString() ?? ""}
+                onValueChange={changeClassroom}
+                disabled={!gradeId || loadingClassrooms || isProcessing}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccionar sección" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {availableClassrooms.map((classroom) => (
+                    <SelectItem key={classroom.id} value={String(classroom.id)}>
+                      {classroom.section.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -264,7 +325,10 @@ function CredentialWorkspace({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => void refetch()}
+              onClick={() => {
+                setPreviewOpen(false);
+                void refetch();
+              }}
               disabled={isFetching}
             >
               <RefreshCw className="size-4" />
