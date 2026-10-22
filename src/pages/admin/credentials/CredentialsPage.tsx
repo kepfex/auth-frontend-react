@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { RefreshCw, QrCode, Loader2 } from "lucide-react";
+import { RefreshCw, QrCode, Loader2, Users,  } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function CredentialsPage() {
   const academicYear = useAppContextStore((state) => state.academicYear);
@@ -244,30 +246,23 @@ function CredentialWorkspace({
       </div>
 
       <Card className="print:hidden">
-        <CardHeader>
-          <CardTitle>Seleccionar aula</CardTitle>
+        <CardHeader className="flex items-center">
+          <CardTitle>Seleccionar aula para </CardTitle>
+          <Badge className="bg-slate-100 dark:bg-slate-800/80 ">
+            {/* Año académico */}
+            <span className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
+              <span>{academicYearName || "Sin seleccionar"}</span>
+            </span>
+            <span className="text-slate-300 dark:text-slate-600">/</span>
+            {/* Nivel educativo */}
+            <span className="flex items-center gap-1.5 font-medium text-slate-900 dark:text-slate-100">
+              <span>Nivel {levelName || "Sin seleccionar"}</span>
+            </span>
+          </Badge>
         </CardHeader>
 
         <CardContent className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Año académico */}
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Año académico</p>
-
-              <div className="flex h-9 items-center text-sm">
-                {academicYearName || "Sin seleccionar"}
-              </div>
-            </div>
-
-            {/* Nivel educativo */}
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Nivel educativo</p>
-
-              <div className="flex h-9 items-center text-sm">
-                {levelName || "Sin seleccionar"}
-              </div>
-            </div>
-
             {/* Grado */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Grado</label>
@@ -320,7 +315,15 @@ function CredentialWorkspace({
       {classroomId && (
         <Card className="print:hidden">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Estudiantes matriculados</CardTitle>
+            <CardTitle className="flex gap-2 items-center">
+              <Users className="w-5"/>
+              <span>Estudiantes matriculados</span>
+              {students.length > 0 && (
+                <Badge variant="info" className="font-mono">
+                  {selectedStudents.length} seleccionados
+                </Badge>
+              )}
+            </CardTitle>
 
             <Button
               variant="outline"
@@ -338,35 +341,50 @@ function CredentialWorkspace({
 
           <CardContent className="space-y-4">
             {isPending ? (
-              <p className="text-sm text-muted-foreground">
-                Cargando estudiantes...
-              </p>
+              <div className="flex gap-5 flex-col">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div className="flex gap-4 justify-between" key={index}>
+                    <div className="flex w-fit items-center gap-4">
+                      <Skeleton className="size-10 shrink-0 rounded-full" />
+                      <div className="grid gap-2">
+                        <Skeleton className="h-4 w-64" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                ))}
+              </div>
             ) : isError ? (
               <p className="text-sm text-destructive">
                 No se pudo consultar los estudiantes del aula.
               </p>
             ) : students.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No hay estudiantes matriculados en esta aula.
-              </p>
+              <EmptyState title=" No hay estudiantes matriculados en esta aula." />
             ) : (
               <>
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 mb-0 p-3 bg-slate-200 rounded-sm">
                   <label className="flex items-center gap-2 text-sm">
                     <Checkbox
+                      className="bg-white"
                       disabled={isProcessing}
                       checked={allSelected}
                       onCheckedChange={(value) => toggleAll(value === true)}
                     />
-                    Seleccionar todos los habilitados
+                    {/* Seleccionar todos los habilitados */}
                   </label>
 
-                  <Badge variant="secondary">
-                    {selectedStudents.length} seleccionados
-                  </Badge>
+                  <div className="flex-4">
+                    <span className="font-bold">Estudiante</span>
+                  </div>
+
+                  <div className="flex-1 text-center">
+                    <span className="font-bold">Estado QR</span>
+                  </div>
                 </div>
 
-                <div className="divide-y rounded-lg border">
+                <div className="divide-y divide-slate-300">
                   {students.map((student) => {
                     const eligible =
                       student.student_status === "activo" &&
@@ -375,7 +393,7 @@ function CredentialWorkspace({
                     return (
                       <div
                         key={student.student_id}
-                        className="flex items-center gap-3 p-3"
+                        className="flex items-center gap-3 p-3 last:border-b last:border-slate-300"
                       >
                         <Checkbox
                           checked={
@@ -387,7 +405,15 @@ function CredentialWorkspace({
                           }
                         />
 
-                        <div className="min-w-0 flex-1">
+                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-700/60">
+                          {student.full_name
+                            .split(" ")
+                            .slice(0, 2)
+                            .map((n) => n[0])
+                            .join("")}
+                        </div>
+
+                        <div className="min-w-0 flex-4">
                           <p className="text-sm font-medium">
                             {student.full_name}
                           </p>
@@ -397,15 +423,17 @@ function CredentialWorkspace({
                           </p>
                         </div>
 
-                        <Badge variant={eligible ? "secondary" : "destructive"}>
-                          {!student.qr
-                            ? "Sin QR"
-                            : !student.qr.is_active
-                              ? "QR deshabilitado"
-                              : student.student_status !== "activo"
-                                ? "Estudiante inactivo"
-                                : "QR habilitado"}
-                        </Badge>
+                        <div className="flex-1 text-center">
+                          <Badge variant={eligible ? "success" : "destructive"}>
+                            {!student.qr
+                              ? "Sin QR"
+                              : !student.qr.is_active
+                                ? "QR deshabilitado"
+                                : student.student_status !== "activo"
+                                  ? "Estudiante inactivo"
+                                  : "QR habilitado"}
+                          </Badge>
+                        </div>
                       </div>
                     );
                   })}
