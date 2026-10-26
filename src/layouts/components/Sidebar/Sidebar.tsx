@@ -66,6 +66,12 @@ const MENU_GROUPS: MenuGroup[] = [
         path: "/admin/employees",
       },
       {
+        id: "assistant-assignments",
+        label: "Asignaciones de auxiliares",
+        icon: ClipboardList,
+        path: "/admin/assistant-assignments",
+      },
+      {
         id: "asistencia",
         label: "Gestión Asistencia",
         icon: CalendarCheck2,
