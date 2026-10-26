@@ -19,6 +19,7 @@ import { AttendanceSettingsPage } from "@/pages/admin/attendance/AttendanceSetti
 import { AttendanceKioskPage } from "@/pages/kiosk/AttendanceKioskPage";
 import { CredentialsPage } from "@/pages/admin/credentials/CredentialsPage";
 import { EmployeesPage } from "@/pages/admin/employees/EmployeesPage";
+import { EmployeeDetailPage } from "@/pages/admin/employees/EmployeeDetailPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -65,6 +66,11 @@ export const AppRouter = () => (
           <Route path="credentials" element={<CredentialsPage />} />
 
           <Route path="employees" element={<EmployeesPage />} />
+
+          <Route
+            path="employees/:employeeId"
+            element={<EmployeeDetailPage />}
+          />
         </Route>
       </Route>
 
