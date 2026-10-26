@@ -1,6 +1,7 @@
 import type { MenuGroup } from "@/layouts/schemas/layout.schema";
 import {
   BarChart3,
+  BriefcaseBusiness,
   CalendarCheck2,
   CalendarClock,
   ClipboardList,
@@ -57,6 +58,12 @@ const MENU_GROUPS: MenuGroup[] = [
         label: "Credenciales escolares",
         icon: IdCard,
         path: "/admin/credentials",
+      },
+      {
+        id: "employees",
+        label: "Empleados",
+        icon: BriefcaseBusiness,
+        path: "/admin/employees",
       },
       {
         id: "asistencia",
