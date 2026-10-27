@@ -15,6 +15,7 @@ export interface AssistantAssignment {
 }
 export interface AssistantAssignmentFilters {
   academic_year_id?: number;
+  educational_level_id?: number;
   employee_id?: number;
   grade_section_id?: number;
   is_active?: boolean;
