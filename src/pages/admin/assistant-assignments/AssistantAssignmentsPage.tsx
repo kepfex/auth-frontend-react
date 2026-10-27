@@ -30,12 +30,24 @@ function localDate(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
-function statusOf(item: AssistantAssignment, today: string): string {
+
+type AssignmentStatus = "Inactiva" | "Programada" | "Finalizada" | "Vigente";
+
+function statusOf(item: AssistantAssignment, today: string): AssignmentStatus {
   if (!item.is_active) return "Inactiva";
   if (item.start_date > today) return "Programada";
-  if (item.end_date && item.end_date < today) return "Finalizada";
+  if (item.end_date !== null && item.end_date < today) return "Finalizada";
   return "Vigente";
 }
+
+function canFinish(item: AssistantAssignment, today: string): boolean {
+  return (
+    item.is_active &&
+    item.start_date <= today &&
+    (item.end_date === null || item.end_date >= today)
+  );
+}
+
 function nameOf(item: AssistantAssignment): string {
   return (
     [
@@ -52,8 +64,9 @@ export function AssistantAssignmentsPage() {
   const academicYear = useAppContextStore((s) => s.academicYear);
   const level = useAppContextStore((s) => s.educationalLevel);
   const classrooms = useClassrooms();
+
   const [classroomFilter, setClassroomFilter] = useState("all");
-  const [periodFilter, setPeriodFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState<"all" | "effective">("all");
   const [page, setPage] = useState(1);
   const [createOpen, setCreateOpen] = useState(false);
   const [finishing, setFinishing] = useState<AssistantAssignment | null>(null);
@@ -63,35 +76,31 @@ export function AssistantAssignmentsPage() {
     setClassroomFilter("all");
     setPage(1);
   }, [academicYear?.id, level?.id]);
+
   useEffect(() => {
     setPage(1);
   }, [classroomFilter, periodFilter]);
 
-  // API de asignaciones filtra por año; el nivel se resuelve por las aulas
-  // del contexto global. En un nivel con más de 100 aulas hay que ampliar
-  // la consulta del backend para filtrar el nivel de forma paginada.
-
+  // El año y el nivel se filtran en Laravel ANTES de paginar (fase 7K-I1).
   const filters = {
     academic_year_id: academicYear?.id,
     educational_level_id: level?.id,
-
     grade_section_id:
       classroomFilter === "all" ? undefined : Number(classroomFilter),
-
     effective_on: periodFilter === "effective" ? today : undefined,
-
     page,
     per_page: 15,
   };
 
-  const assignments = useAssistantAssignments(filters, !!academicYear?.id);
-  const rows = assignments.data?.data ?? [];
-
+  const assignments = useAssistantAssignments(
+    filters,
+    Boolean(academicYear?.id),
+  );
   const classroomOptions = classrooms.data ?? [];
-  const canFinish = (item: AssistantAssignment) =>
-    item.is_active &&
-    item.start_date <= today &&
-    (!item.end_date || item.end_date >= today);
+  const rows = assignments.data?.data ?? [];
+  // keepPreviousData no debe mostrar registros de otro año/nivel durante la transición.
+  const showLoading = assignments.isPending || assignments.isPlaceholderData;
+  const pagination = assignments.data?.meta;
 
   return (
     <div className="space-y-6">
@@ -101,13 +110,16 @@ export function AssistantAssignmentsPage() {
             Asignaciones de auxiliares
           </h1>
           <p className="text-sm text-muted-foreground">
-            Administra los responsables de cada grado y sección y consulta su
-            historial.
+            Administra responsables por grado y sección y consulta su historial.
           </p>
         </div>
         <Button
           onClick={() => setCreateOpen(true)}
-          disabled={!academicYear || classroomOptions.length === 0}
+          disabled={
+            !academicYear ||
+            classrooms.isLoading ||
+            classroomOptions.length === 0
+          }
         >
           <Plus className="mr-2 size-4" />
           Nueva asignación
@@ -125,8 +137,7 @@ export function AssistantAssignmentsPage() {
         <CardContent className="space-y-4">
           {!academicYear ? (
             <p className="rounded-md border p-6 text-sm text-muted-foreground">
-              Selecciona un año académico en la barra superior para consultar
-              las asignaciones.
+              Selecciona un año académico en la barra superior.
             </p>
           ) : (
             <>
@@ -135,6 +146,7 @@ export function AssistantAssignmentsPage() {
                   <Select
                     value={classroomFilter}
                     onValueChange={setClassroomFilter}
+                    disabled={classrooms.isLoading || classrooms.isError}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Aula" />
@@ -155,7 +167,12 @@ export function AssistantAssignmentsPage() {
                   </Select>
                 </div>
                 <div className="min-w-[180px]">
-                  <Select value={periodFilter} onValueChange={setPeriodFilter}>
+                  <Select
+                    value={periodFilter}
+                    onValueChange={(value) =>
+                      setPeriodFilter(value as "all" | "effective")
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Período" />
                     </SelectTrigger>
@@ -177,120 +194,141 @@ export function AssistantAssignmentsPage() {
                   />
                 </Button>
               </div>
-              {assignments.isError ? (
-                <p className="rounded-md border p-5 text-sm text-destructive">
-                  No se pudieron cargar los datos. Comprueba la API e inténtalo
-                  nuevamente.
+
+              {classrooms.isError && (
+                <p className="text-xs text-muted-foreground">
+                  No se pudieron cargar las aulas. Puedes seguir consultando el
+                  listado.
                 </p>
-              ) : assignments.isLoading ? (
+              )}
+              {assignments.isError ? (
+                <div className="space-y-2 rounded-md border p-5 text-sm text-destructive">
+                  <p>No se pudieron cargar las asignaciones.</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => assignments.refetch()}
+                  >
+                    Reintentar
+                  </Button>
+                </div>
+              ) : showLoading ? (
                 <p className="py-10 text-center text-sm text-muted-foreground">
                   Cargando asignaciones…
                 </p>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Auxiliar</TableHead>
-                      <TableHead>Aula</TableHead>
-                      <TableHead>Inicio</TableHead>
-                      <TableHead>Fin</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead className="text-right">Acción</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rows.length ? (
-                      rows.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            <Link
-                              to={`/admin/employees/${item.employee_id}`}
-                              className="font-medium text-primary hover:underline"
-                            >
-                              {nameOf(item)}
-                            </Link>
-                            <p className="font-mono text-xs text-muted-foreground">
-                              {item.employee?.employee_code}
-                            </p>
-                          </TableCell>
-                          <TableCell>
-                            {item.grade_section?.grade?.name ?? "Grado"} ·{" "}
-                            {item.grade_section?.section?.name ??
-                              item.grade_section_id}
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {item.start_date}
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {item.end_date ?? "Sin fecha"}
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={
-                                statusOf(item, today) === "Vigente"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                            >
-                              {statusOf(item, today)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {canFinish(item) && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setFinishing(item)}
-                              >
-                                <CalendarClock className="mr-1 size-4" />
-                                Finalizar
-                              </Button>
-                            )}
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Auxiliar</TableHead>
+                        <TableHead>Aula</TableHead>
+                        <TableHead>Inicio</TableHead>
+                        <TableHead>Fin</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead className="text-right">Acción</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {rows.length > 0 ? (
+                        rows.map((item) => {
+                          const status = statusOf(item, today);
+                          return (
+                            <TableRow key={item.id}>
+                              <TableCell>
+                                <Link
+                                  to={`/admin/employees/${item.employee_id}`}
+                                  className="font-medium text-primary hover:underline"
+                                >
+                                  {nameOf(item)}
+                                </Link>
+                                <p className="font-mono text-xs text-muted-foreground">
+                                  {item.employee?.employee_code}
+                                </p>
+                              </TableCell>
+                              <TableCell>
+                                {item.grade_section?.grade?.name ?? "Grado"} ·{" "}
+                                {item.grade_section?.section?.name ??
+                                  item.grade_section_id}
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {item.start_date}
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {item.end_date ?? "Sin fecha"}
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    status === "Vigente"
+                                      ? "default"
+                                      : "secondary"
+                                  }
+                                >
+                                  {status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {canFinish(item, today) && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setFinishing(item)}
+                                  >
+                                    <CalendarClock className="mr-1 size-4" />
+                                    Finalizar
+                                  </Button>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={6}
+                            className="h-28 text-center text-muted-foreground"
+                          >
+                            {periodFilter === "effective"
+                              ? "No hay asignaciones vigentes hoy en este contexto."
+                              : "No se encontraron asignaciones en este contexto."}
                           </TableCell>
                         </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={6}
-                          className="h-28 text-center text-muted-foreground"
+                      )}
+                    </TableBody>
+                  </Table>
+                  {pagination && pagination.total > 0 && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+                      <span>
+                        Página {pagination.current_page} de{" "}
+                        {pagination.last_page} · {pagination.total} registros
+                        encontrados
+                      </span>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={page <= 1 || assignments.isFetching}
+                          onClick={() => setPage((p) => Math.max(1, p - 1))}
                         >
-                          No se encontraron asignaciones en este contexto.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              )}
-              {assignments.data && assignments.data.meta.total > 0 && (
-                <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
-                  <span>
-                    Página {assignments.data.meta.current_page} de{" "}
-                    {assignments.data.meta.last_page} ·{" "}
-                    {assignments.data.meta.total} registros encontrados{" "}
-                  </span>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={page <= 1 || assignments.isFetching}
-                      onClick={() => setPage((n) => n - 1)}
-                    >
-                      Anterior
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={
-                        page >= assignments.data.meta.last_page ||
-                        assignments.isFetching
-                      }
-                      onClick={() => setPage((n) => n + 1)}
-                    >
-                      Siguiente
-                    </Button>
-                  </div>
-                </div>
+                          Anterior
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={
+                            page >= pagination.last_page ||
+                            assignments.isFetching
+                          }
+                          onClick={() => setPage((p) => p + 1)}
+                        >
+                          Siguiente
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
