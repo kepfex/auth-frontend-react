@@ -7,6 +7,7 @@ import {
   ClipboardList,
   FileSpreadsheet,
   GraduationCap,
+  HouseCog,
   IdCard,
   LayoutDashboard,
   ScanQrCodeIcon,
@@ -70,6 +71,12 @@ const MENU_GROUPS: MenuGroup[] = [
         label: "Asignaciones de auxiliares",
         icon: ClipboardList,
         path: "/admin/assistant-assignments",
+      },
+      {
+        id: "institution-settings",
+        label: "Datos generales",
+        icon: HouseCog,
+        path: "/admin/institution-settings",
       },
       {
         id: "asistencia",
