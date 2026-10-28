@@ -25,7 +25,6 @@ export const STUDENT_CREATE_DEFAULT_VALUES: StudentCreateFormValues = {
   },
 
   student: {
-    student_code: "",
     status: "activo",
   },
 };

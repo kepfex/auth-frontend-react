@@ -30,7 +30,6 @@ export interface StudentFilters {
 }
 
 interface StudentBaseRequest {
-  student_code: string;
   status?: StudentStatus;
 }
 

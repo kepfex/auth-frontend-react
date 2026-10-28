@@ -6,7 +6,6 @@ import { toast, } from "sonner";
 import { Alert, AlertDescription, AlertTitle, } from "@/components/ui/alert";
 import { Button, } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
-import { Input, } from "@/components/ui/input";
 import { Label, } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { Separator, } from "@/components/ui/separator";
@@ -282,10 +281,6 @@ export const StudentDataStep = ({
             person_id:
               existingPerson.id,
 
-            student_code:
-              values.student
-                .student_code,
-
             status:
               values.student.status,
           };
@@ -337,10 +332,6 @@ export const StudentDataStep = ({
 
               is_active: true,
             },
-
-            student_code:
-              values.student
-                .student_code,
 
             status:
               values.student.status,
@@ -534,33 +525,8 @@ export const StudentDataStep = ({
                 </div>
 
                 <div className="grid gap-5 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="student_code">
-                      Código del estudiante *
-                    </Label>
-
-                    <Input
-                      id="student_code"
-                      {...form.register(
-                        "student.student_code",
-                      )}
-                    />
-
-                    {form.formState
-                      .errors.student
-                      ?.student_code
-                      ?.message && (
-                        <p className="text-sm text-destructive">
-                          {
-                            form
-                              .formState
-                              .errors
-                              .student
-                              .student_code
-                              .message
-                          }
-                        </p>
-                      )}
+                  <div className="rounded-md border p-3 text-sm text-muted-foreground">
+                    El código institucional del estudiante se generará automáticamente al guardar.
                   </div>
 
                   <div className="space-y-2">
