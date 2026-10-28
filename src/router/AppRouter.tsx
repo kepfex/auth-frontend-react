@@ -21,6 +21,7 @@ import { CredentialsPage } from "@/pages/admin/credentials/CredentialsPage";
 import { EmployeesPage } from "@/pages/admin/employees/EmployeesPage";
 import { EmployeeDetailPage } from "@/pages/admin/employees/EmployeeDetailPage";
 import { AssistantAssignmentsPage } from "@/pages/admin/assistant-assignments/AssistantAssignmentsPage";
+import { InstitutionSettingsPage } from "@/pages/admin/institution/InstitutionSettingsPage";
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -76,6 +77,11 @@ export const AppRouter = () => (
           <Route
             path="assistant-assignments"
             element={<AssistantAssignmentsPage />}
+          />
+
+          <Route
+            path="institution-settings"
+            element={<InstitutionSettingsPage />}
           />
         </Route>
       </Route>
